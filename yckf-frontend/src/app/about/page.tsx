@@ -1,7 +1,89 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { ReloadIcon } from '@radix-ui/react-icons';
+import { client } from '@/lib/sanity';
 
-export default function About() {
+// Define interfaces for Sanity data with optional fields
+interface AboutData {
+  title: string;
+  description: string;
+  image?: { asset: { url: string } }; // Optional image
+  whoWeAre: string;
+  mission: string;
+  vision: string;
+  story: string;
+  coreValues: { value: string }[]; // Always an array
+  history?: string; // Optional
+  historyMilestones?: { milestone: string }[]; // Optional array
+}
+
+interface Testimonial {
+  quote: string;
+  name: string;
+  title: string;
+  image?: { asset: { url: string } }; // Optional image
+}
+
+async function getAboutData(): Promise<AboutData> {
+  const query = `*[_type == "about"][0] {
+    title,
+    description,
+    image,
+    whoWeAre,
+    mission,
+    vision,
+    story,
+    coreValues[] {
+      value
+    },
+    history,
+    historyMilestones[] {
+      milestone
+    }
+  }`;
+  const data = await client.fetch(query);
+  return {
+    title: data?.title || '',
+    description: data?.description || '',
+    image: data?.image || undefined,
+    whoWeAre: data?.whoWeAre || '',
+    mission: data?.mission || '',
+    vision: data?.vision || '',
+    story: data?.story || '',
+    coreValues: data?.coreValues || [], // Ensure it's an array
+    history: data?.history || '',
+    historyMilestones: data?.historyMilestones || [],
+  };
+}
+
+async function getTestimonials(): Promise<Testimonial[]> {
+  const query = `*[_type == "testimonial"] {
+    quote,
+    name,
+    title,
+    image
+  }`;
+  const testimonials = await client.fetch(query);
+  return testimonials || []; // Fallback for empty array
+}
+
+// ⚠️ Note: Since this is an async Server Component, any missing data 
+// will only show the spinner if the data is *falsy* (e.g., an empty string) 
+// and the query succeeded. If the query *failed*, Next.js would usually 
+// show an error boundary unless you wrap the fetch in a try/catch.
+
+// Helper component for the spinner fallback
+const SpinnerFallback = () => (
+    <div className="flex items-center justify-center py-4">
+        <ReloadIcon className="w-8 h-8 text-gray-500 animate-spin dark:text-gray-400" />
+    </div>
+);
+
+
+export default async function About() {
+  const data = await getAboutData();
+  const testimonials = await getTestimonials();
+
   return (
     <div className="flex flex-col min-h-screen text-gray-900 bg-white dark:bg-gray-900 dark:text-gray-100">
       <Header />
@@ -9,15 +91,17 @@ export default function About() {
         {/* Hero Section with Image on Right */}
         <section className="relative py-20 bg-gray-100 dark:bg-gray-800">
           <div className="flex flex-col items-center max-w-5xl gap-8 px-4 mx-auto md:flex-row-reverse">
-            <img
-              src="/blackman_pointing3.jpg" // Replace with your screenshot URL or uploaded image
-              alt="YCKF Overview"
-              className="object-cover w-full h-64 rounded-lg shadow-md md:w-1/3"
-            />
+            {data.image?.asset && (
+              <img
+                src={data.image.asset.url}
+                alt={data.title || 'YCKF Overview'}
+                className="object-cover w-full h-64 rounded-lg shadow-md md:w-1/3"
+              />
+            )}
             <div className="text-center md:text-left">
-              <h1 className="mb-4 text-5xl font-bold text-gray-900 dark:text-gray-100">About Us</h1>
+              <h1 className="mb-4 text-5xl font-bold text-gray-900 dark:text-gray-100">{data.title || 'About Us'}</h1>
               <p className="max-w-2xl mx-auto text-xl text-gray-600 md:mx-0 dark:text-gray-400">
-                Welcome to the Young Cyber Knights Foundation (YCKF), a nonprofit dedicated to fostering cybersecurity excellence and empowering the next generation of professionals.
+                {data.description || 'Learn more about the Young Cyber Knights Foundation.'}
               </p>
             </div>
           </div>
@@ -28,27 +112,33 @@ export default function About() {
           <div className="max-w-5xl mx-auto">
             <h2 className="mb-6 text-3xl font-semibold text-center text-gray-900 dark:text-gray-100">Who We Are</h2>
             <p className="mb-6 text-lg text-gray-600 dark:text-gray-400">
-              Young Cyber Knights is an initiative aimed at nurturing the next generation of cybersecurity professionals. This program focuses on providing young individuals with foundational knowledge and practical skills in the field of cybersecurity through engaging, educational activities and hands-on experiences.
+              {/* FIXED: Check for data.whoWeAre, otherwise render SpinnerFallback component */}
+              {data.whoWeAre || <SpinnerFallback />} 
             </p>
             <h2 className="mb-6 text-3xl font-semibold text-center text-gray-900 dark:text-gray-100">Our Mission</h2>
             <p className="mb-6 text-lg text-gray-600 dark:text-gray-400">
-              Our core mission is to bridge the growing skills gap in cybersecurity by targeting high school and college students, encouraging their interest in the field early on. The program offers a variety of resources including workshops, training sessions, and competitions designed to teach participants about the principles of cybersecurity, including threat identification, network security, and ethical hacking.
+              {/* FIXED: Check for data.mission, otherwise render SpinnerFallback component */}
+              {data.mission || <SpinnerFallback />}
             </p>
             <h2 className="mb-6 text-3xl font-semibold text-center text-gray-900 dark:text-gray-100">Our Vision</h2>
             <p className="mb-6 text-lg text-gray-600 dark:text-gray-400">
-              We envision a future where everyone can participate safely in the digital world, protected from threats and empowered with the skills to succeed.
+              {/* FIXED: Check for data.vision, otherwise render SpinnerFallback component */}
+              {data.vision || <SpinnerFallback />}
             </p>
             <h2 className="mb-6 text-3xl font-semibold text-center text-gray-900 dark:text-gray-100">Our Story</h2>
             <p className="mb-6 text-lg text-gray-600 dark:text-gray-400">
-              Born out of the increasing need for cybersecurity awareness and digital safety, our foundation started as a grassroots initiative and quickly grew into a nationwide movement. What began with a few school workshops has evolved into a series of impactful campaigns, training programs, and collaborations with key stakeholders.
+              {/* FIXED: Check for data.story, otherwise render SpinnerFallback component */}
+              {data.story || <SpinnerFallback />}
             </p>
+            
             <h2 className="mb-6 text-3xl font-semibold text-center text-gray-900 dark:text-gray-100">Our Core Values</h2>
             <ul className="space-y-2 text-gray-600 list-disc list-inside dark:text-gray-400">
-              <li>Education First: We believe that awareness is the first step toward empowerment.</li>
-              <li>Inclusivity: Everyone deserves access to digital safety knowledge, regardless of background.</li>
-              <li>Collaboration: We work with governments, institutions, and tech leaders to broaden our reach.</li>
-              <li>Transparency: We operate with honesty, openness, and accountability.</li>
-              <li>Community-Driven: Our programs are designed with and for the people they serve.</li>
+              {data.coreValues.length > 0 ? (
+                data.coreValues.map((value, index) => <li key={index}>{value.value}</li>)
+              ) : (
+                // Already correctly rendering the spinner here, but wrapped in the helper for consistency
+                <SpinnerFallback /> 
+              )}
             </ul>
           </div>
         </section>
@@ -62,91 +152,48 @@ export default function About() {
             </p>
             <div className="overflow-x-hidden whitespace-nowrap">
               <div className="inline-flex animate-scroll" style={{ animationDuration: '20s', width: '200%' }}>
-                <div className="inline-flex items-center px-6 space-x-8">
-                  <div className="p-6 bg-white rounded-lg shadow-md dark:bg-gray-700">
-                    <img
-                      src="/black_woman1.jpg" // Placeholder round icon - replace with your image
-                      alt="Quote Icon"
-                      className="object-cover w-12 h-12 mb-2 rounded-full"
-                    />
-                    <p className="mb-4 text-base italic leading-tight text-gray-600 dark:text-gray-400">"The workshops and training were essential to my understanding of cybersecurity. I now feel equipped to handle potential threats."</p>
-                    <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100">Jane Smith</h3>
-                    <p className="text-gray-600 dark:text-gray-400">IT Professional</p>
-                  </div>
-                  <div className="p-6 bg-white rounded-lg shadow-md dark:bg-gray-700">
-                    <img
-                      src="https://via.placeholder.com/50" // Placeholder round icon - replace with your image
-                      alt="Quote Icon"
-                      className="object-cover w-12 h-12 mb-2 rounded-full"
-                    />
-                    <p className="mb-4 text-base italic leading-tight text-gray-600 dark:text-gray-400">"As a business owner, I feel more confident about my company's online security. Thanks to the foundation's workshops!"</p>
-                    <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100">John Doe</h3>
-                    <p className="text-gray-600 dark:text-gray-400">Tech Entrepreneur</p>
-                  </div>
-                  <div className="p-6 bg-white rounded-lg shadow-md dark:bg-gray-700">
-                    <img
-                      src="https://via.placeholder.com/50" // Placeholder round icon - replace with your image
-                      alt="Quote Icon"
-                      className="object-cover w-12 h-12 mb-2 rounded-full"
-                    />
-                    <p className="mb-4 text-base italic leading-tight text-gray-600 dark:text-gray-400">"The community-driven approach is what makes this foundation stand out. I gained so much insight into securing my online presence."</p>
-                    <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100">Emily Davies</h3>
-                    <p className="text-gray-600 dark:text-gray-400">Security Analyst</p>
-                  </div>
-                  <div className="p-6 bg-white rounded-lg shadow-md dark:bg-gray-700">
-                    <img
-                      src="https://via.placeholder.com/50" // Placeholder round icon - replace with your image
-                      alt="Quote Icon"
-                      className="object-cover w-12 h-12 mb-2 rounded-full"
-                    />
-                    <p className="mb-4 text-base italic leading-tight text-gray-600 dark:text-gray-400">"This foundation helped me understand cybersecurity from the ground up. The training sessions were insightful and practical!"</p>
-                    <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100">Kwame Adamu</h3>
-                    <p className="text-gray-600 dark:text-gray-400">CEO, Adamu Group of Companies</p>
-                  </div>
-                </div>
-                {/* Duplicate content for seamless looping */}
-                <div className="inline-flex items-center px-6 space-x-8">
-                  <div className="p-6 bg-white rounded-lg shadow-md dark:bg-gray-700">
-                    <img
-                      src="https://via.placeholder.com/50" // Placeholder round icon - replace with your image
-                      alt="Quote Icon"
-                      className="object-cover w-12 h-12 mb-2 rounded-full"
-                    />
-                    <p className="mb-4 text-base italic leading-tight text-gray-600 dark:text-gray-400">"The workshops and training were essential to my understanding of cybersecurity. I now feel equipped to handle potential threats."</p>
-                    <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100">Jane Smith</h3>
-                    <p className="text-gray-600 dark:text-gray-400">IT Professional</p>
-                  </div>
-                  <div className="p-6 bg-white rounded-lg shadow-md dark:bg-gray-700">
-                    <img
-                      src="https://via.placeholder.com/50" // Placeholder round icon - replace with your image
-                      alt="Quote Icon"
-                      className="object-cover w-12 h-12 mb-2 rounded-full"
-                    />
-                    <p className="mb-4 text-base italic leading-tight text-gray-600 dark:text-gray-400">"As a business owner, I feel more confident about my company's online security. Thanks to the foundation's workshops!"</p>
-                    <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100">John Doe</h3>
-                    <p className="text-gray-600 dark:text-gray-400">Tech Entrepreneur</p>
-                  </div>
-                  <div className="p-6 bg-white rounded-lg shadow-md dark:bg-gray-700">
-                    <img
-                      src="https://via.placeholder.com/50" // Placeholder round icon - replace with your image
-                      alt="Quote Icon"
-                      className="object-cover w-12 h-12 mb-2 rounded-full"
-                    />
-                    <p className="mb-4 text-base italic leading-tight text-gray-600 dark:text-gray-400">"The community-driven approach is what makes this foundation stand out. I gained so much insight into securing my online presence."</p>
-                    <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100">Emily Davies</h3>
-                    <p className="text-gray-600 dark:text-gray-400">Security Analyst</p>
-                  </div>
-                  <div className="p-6 bg-white rounded-lg shadow-md dark:bg-gray-700">
-                    <img
-                      src="https://via.placeholder.com/50" // Placeholder round icon - replace with your image
-                      alt="Quote Icon"
-                      className="object-cover w-12 h-12 mb-2 rounded-full"
-                    />
-                    <p className="mb-4 text-base italic leading-tight text-gray-600 dark:text-gray-400">"This foundation helped me understand cybersecurity from the ground up. The training sessions were insightful and practical!"</p>
-                    <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100">Kwame Adamu</h3>
-                    <p className="text-gray-600 dark:text-gray-400">CEO, Adamu Group of Companies</p>
-                  </div>
-                </div>
+                {testimonials.length > 0 ? (
+                    <>
+                        {/* Original content */}
+                        <div className="inline-flex items-center px-6 space-x-8">
+                            {testimonials.map((testimonial, index) => (
+                                <div key={index} className="flex-shrink-0 p-6 bg-white rounded-lg shadow-md w-80 dark:bg-gray-700">
+                                    {testimonial.image?.asset && (
+                                        <img
+                                            src={testimonial.image.asset.url}
+                                            alt={`${testimonial.name}'s Profile`}
+                                            className="object-cover w-12 h-12 mb-2 rounded-full"
+                                        />
+                                    )}
+                                    <p className="mb-4 text-base italic leading-tight text-gray-600 dark:text-gray-400">{testimonial.quote}</p>
+                                    <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100">{testimonial.name}</h3>
+                                    <p className="text-gray-600 dark:text-gray-400">{testimonial.title}</p>
+                                </div>
+                            ))}
+                        </div>
+                        {/* Duplicate content for seamless looping */}
+                        <div className="inline-flex items-center px-6 space-x-8">
+                            {testimonials.map((testimonial, index) => (
+                                <div key={`dup-${index}`} className="flex-shrink-0 p-6 bg-white rounded-lg shadow-md w-80 dark:bg-gray-700">
+                                    {testimonial.image?.asset && (
+                                        <img
+                                            src={testimonial.image.asset.url}
+                                            alt={`${testimonial.name}'s Profile`}
+                                            className="object-cover w-12 h-12 mb-2 rounded-full"
+                                        />
+                                    )}
+                                    <p className="mb-4 text-base italic leading-tight text-gray-600 dark:text-gray-400">{testimonial.quote}</p>
+                                    <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100">{testimonial.name}</h3>
+                                    <p className="text-gray-600 dark:text-gray-400">{testimonial.title}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                ) : (
+                    <div className="flex items-center justify-center w-full p-10">
+                        <SpinnerFallback />
+                    </div>
+                )}
               </div>
             </div>
           </div>
@@ -157,12 +204,16 @@ export default function About() {
           <div className="max-w-5xl mx-auto">
             <h2 className="mb-6 text-3xl font-semibold text-center text-gray-900 dark:text-gray-100">Our History</h2>
             <p className="mb-6 text-lg text-gray-600 dark:text-gray-400">
-              Founded in 2015, YCKF started as a small initiative to address the growing need for cybersecurity education. Over the decade, we’ve grown into a recognized leader, with milestones including:
+              {/* FIXED: Check for data.history, otherwise render SpinnerFallback component */}
+              {data.history || <SpinnerFallback />}
             </p>
             <ul className="space-y-2 text-gray-600 list-disc list-inside dark:text-gray-400">
-              <li>First workshop in 2016, training 50 participants.</li>
-              <li>Community training launch in 2019, reaching 500+ individuals.</li>
-              <li>Annual Summit debut in 2023, featuring global experts.</li>
+              {data.historyMilestones && data.historyMilestones.length > 0 ? (
+                data.historyMilestones.map((milestone, index) => <li key={index}>{milestone.milestone}</li>)
+              ) : (
+                // Already correctly rendering the spinner here, but wrapped in the helper for consistency
+                <SpinnerFallback />
+              )}
             </ul>
           </div>
         </section>
