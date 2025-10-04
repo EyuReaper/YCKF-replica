@@ -1,0 +1,111 @@
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import { client } from '@/lib/sanity';
+import { RiLoader2Fill } from 'react-icons/ri'; // Import a spinner icon from react-icons
+
+// Define interface for Sanity data
+interface BlogData {
+  title: string;
+  excerpt: string;
+  content: string;
+  author: string;
+  date: string; // ISO datetime string
+  image?: { asset: { url: string } } | null; // Optional image
+}
+
+interface BlogsResponse {
+  blogs: BlogData[]; // Array of blogs
+}
+
+// Helper component for the spinner fallback
+const SpinnerFallback = () => (
+  <div className="flex items-center justify-center py-4">
+    <RiLoader2Fill className="w-12 h-12 text-gray-500 animate-spin dark:text-gray-400" />
+  </div>
+);
+
+async function getBlogsData(): Promise<BlogsResponse> {
+  const query = `*[_type == "blogs"] {
+    title,
+    excerpt,
+    content,
+    author,
+    date,
+    image {
+      asset->{
+        url
+      }
+    }
+  }`;
+  const blogs = await client.fetch(query);
+  console.log('Blogs Data:', blogs); // Debug log
+  return { blogs: blogs || [] };
+}
+
+export default async function Blogs() {
+  const { blogs } = await getBlogsData();
+
+  return (
+    <div className="flex flex-col min-h-screen text-gray-900 bg-white dark:bg-gray-900 dark:text-gray-100">
+      <Header />
+      <main className="flex-1">
+        <section className="px-4 py-16">
+          <div className="max-w-5xl mx-auto">
+            <h1 className="mb-6 text-3xl font-bold text-gray-900 dark:text-gray-100">Cybersecurity Insights & Stories</h1>
+
+            {/* Search Bar */}
+            <div className="flex mb-8">
+              <input
+                type="text"
+                placeholder="Search blogs..."
+                className="px-4 py-2 bg-white border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {blogs.length > 0 ? (
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {blogs.map((blog, index) => (
+                  <div key={index} className="p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
+                    {blog.image?.asset && (
+                      <img
+                        src={blog.image.asset.url}
+                        alt={blog.title}
+                        className="object-cover w-full h-48 mb-4 rounded-lg"
+                      />
+                    )}
+                    <h3 className="mb-2 text-xl font-bold text-gray-900 dark:text-gray-100">{blog.title}</h3>
+                    <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                      {new Date(blog.date).toLocaleDateString()} | By {blog.author}
+                    </p>
+                    <p className="mb-4 text-gray-600 dark:text-gray-400">{blog.excerpt}</p>
+                    <a
+                      href={blog.registrationUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700"
+                    >
+                      Read more 
+                    </a>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="py-12 text-center">
+                <SpinnerFallback />
+                <p className="mt-4 text-red-600 dark:text-red-400">No blogs available at the moment.</p>
+              </div>
+            )}
+
+            {/* Load More Button */}
+            <div className="flex justify-center mt-8">
+              <button className="px-6 py-3 text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                Load More
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+      <Footer />
+    </div>
+  );
+}

@@ -3,10 +3,12 @@ import HeroSection from '@/components/HeroSection';
 import ContentBlock from '@/components/ContentBlock';
 import TestimonialSection from '@/components/TestimonialSection';
 import Footer from '@/components/Footer';
+import TopBar from '@/components/TopBar';
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen text-gray-900 bg-white dark:bg-gray-900 dark:text-gray-100">
+      <TopBar/>
       <Header />
       <HeroSection />
       <ContentBlock
