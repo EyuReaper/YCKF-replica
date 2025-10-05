@@ -3,7 +3,8 @@ import Footer from '@/components/Footer';
 import { client } from '@/lib/sanity';
 import { RiLoader2Fill } from 'react-icons/ri'; // Import a spinner icon from react-icons
 import Link from 'next/link'; // Import Link for navigation
-
+import TopBar
+  from '@/components/TopBar';
 // Define interface for Sanity data
 interface TrainingData {
   title: string;
@@ -50,6 +51,7 @@ export default async function FreeTraining() {
 
   return (
     <div className="flex flex-col min-h-screen text-gray-900 bg-white dark:bg-gray-900 dark:text-gray-100">
+      <TopBar/>
       <Header />
       <main className="flex-1">
         {/* Main Content Section */}

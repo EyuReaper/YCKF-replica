@@ -1,7 +1,10 @@
-'use client'
+'use client'; // Ensure client-side rendering
+
 import { useState, useEffect } from 'react';
+import { useTheme } from '@/context/ThemeContext';
 
 export default function TopBar() {
+  const { theme } = useTheme(); // Access theme from context
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -24,15 +27,19 @@ export default function TopBar() {
     timeZone: 'Africa/Addis_Ababa',
   });
 
+  // Apply theme-aware styles
+  const textColor = theme === 'dark' ? 'text-white' : 'text-gray-900';
+  const bgColor = theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200';
+
   return (
-    <div className="bg-gray-800 text-white py-2 text-center">
+    <div className={`${bgColor} ${textColor} py-2 text-center`}>
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center px-4 text-sm">
         <div className="mb-2 sm:mb-0">
-          <span>Welcome to YCKF Hub! | </span>
+          <span>Welcome to YCKF! | </span>
           <span>{formattedDate} | {formattedTime} EAT</span>
         </div>
         <div>
-          <a href="/contact" className="underline hover:text-blue-300 ml-2">
+          <a href="/contact" className={`underline hover:${theme === 'dark' ? 'text-blue-300' : 'text-blue-600'} ml-2`}>
             Contact Us
           </a>
         </div>

@@ -1,9 +1,11 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import TopBar from '@/components/TopBar';
 
 export default function Contact() {
   return (
     <div className="flex flex-col min-h-screen text-gray-900 bg-white dark:bg-gray-900 dark:text-gray-100">
+      <TopBar/>
       <Header />
       <main className="flex-1">
         <section className="px-4 py-16 mx-auto max-w-7xl">
