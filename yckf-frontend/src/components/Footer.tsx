@@ -18,7 +18,7 @@ const Footer = () => {
       <div className="grid max-w-5xl grid-cols-1 gap-6 mx-auto md:grid-cols-3">
         <div className="text-center md:text-left">
           <h3 className={`mb-4 text-2xl font-semibold ${textClass}`}>YCKF</h3>
-          <p className={secondaryTextClass}>Empowering youth in cybersecurity, fostering skills and talent to secure digital environ.</p>
+          <p className={secondaryTextClass}>Empowering youth in cybersecurity, fostering skills and talent to secure digital environment.</p>
         </div>
         <div className="text-center md:text-left">
           <h3 className={`mb-4 text-2xl font-semibold ${textClass}`}>Company</h3>

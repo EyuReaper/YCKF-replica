@@ -1,4 +1,4 @@
-'use client';
+'use client'; 
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -10,12 +10,14 @@ import { Search, Moon, Sun, Menu, X, ChevronDown } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 
 const Header = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { theme, setTheme } = useTheme();
-  const [isDarkTheme, setIsDarkTheme] = useState(theme === 'light');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // Sync theme with document class on client mount
   useEffect(() => {
-    setIsDarkTheme(theme === 'dark');
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    // Optional: Persist theme to localStorage if not handled by context
+    localStorage.setItem('theme', theme);
   }, [theme]);
 
   return (
@@ -82,8 +84,35 @@ const Header = () => {
               </DropdownMenu.Content>
             </DropdownMenu.Portal>
           </DropdownMenu.Root>
-          <Link href="/services" className="py-2 font-semibold text-gray-900 transition-colors hover:text-blue-600 dark:text-white dark:hover:text-blue-400">
-            Free Training
+          <DropdownMenu.Root>
+            <DropdownMenu.Trigger asChild>
+              <button className="flex items-center gap-1 py-2 font-semibold text-gray-900 transition-colors hover:text-blue-600 dark:text-white dark:hover:text-blue-400 focus:outline-none hover:bg-transparent">
+                <span>Training</span>
+                <ChevronDown size={16} />
+              </button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Portal>
+              <DropdownMenu.Content className="bg-white dark:bg-gray-800 rounded-md shadow-lg py-2 w-48 min-w-[180px] border border-gray-200 dark:border-gray-700 z-50">
+                <DropdownMenu.Item asChild>
+                  <Link href="/free-training" className="block px-4 py-2 text-gray-900 dark:hover:text-white hover:bg-gray-100 hover:text-gray-900 dark:text-white dark:hover:bg-gray-700">
+                    Free Training
+                  </Link>
+                </DropdownMenu.Item>
+                <DropdownMenu.Item asChild>
+                  <Link href="/premium-training" className="block px-4 py-2 text-gray-900 dark:hover:text-white hover:bg-gray-100 hover:text-gray-900 dark:text-white dark:hover:bg-gray-700">
+                    Premium Training
+                  </Link>
+                </DropdownMenu.Item>
+                <DropdownMenu.Item asChild>
+                  <Link href="/student-dashboard" className="block px-4 py-2 text-gray-900 dark:hover:text-white hover:bg-gray-100 hover:text-gray-900 dark:text-white dark:hover:bg-gray-700">
+                    Student Dashboard
+                  </Link>
+                </DropdownMenu.Item>
+              </DropdownMenu.Content>
+            </DropdownMenu.Portal>
+          </DropdownMenu.Root>
+          <Link href="/blogs" className="py-2 font-semibold text-gray-900 transition-colors hover:text-blue-600 dark:text-white dark:hover:text-blue-400">
+            Blogs
           </Link>
           <Link href="/contact" className="py-2 font-semibold text-gray-900 transition-colors hover:text-blue-600 dark:text-white dark:hover:text-blue-400">
             Contact
@@ -155,19 +184,19 @@ const Header = () => {
                 <DropdownMenu.Content className="absolute right-0 z-50 w-32 py-2 mt-2 bg-white border border-gray-200 rounded-md shadow-lg dark:bg-gray-800 dark:border-gray-700">
                   <DropdownMenu.Item
                     onSelect={() => setTheme('system')}
-                    className="flex items-center gap-2 px-4 py-2 text-gray-700 dark:text-white dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900"
+                    className="flex items-center gap-2 px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900"
                   >
                     <span>System</span>
                   </DropdownMenu.Item>
                   <DropdownMenu.Item
                     onSelect={() => setTheme('light')}
-                    className="flex items-center gap-2 px-4 py-2 text-gray-700 dark:text-white dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900"
+                    className="flex items-center gap-2 px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900"
                   >
                     <Sun size={16} className="text-yellow-400" /> Light
                   </DropdownMenu.Item>
                   <DropdownMenu.Item
                     onSelect={() => setTheme('dark')}
-                    className="flex items-center gap-2 px-4 py-2 text-gray-700 dark:text-white dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900"
+                    className="flex items-center gap-2 px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900"
                   >
                     <Moon size={16} className="text-gray-400 dark:text-white" /> Dark
                   </DropdownMenu.Item>
@@ -230,8 +259,36 @@ const Header = () => {
               </DropdownMenu.Content>
             </DropdownMenu.Portal>
           </DropdownMenu.Root>
-          <Link href="/services" className="block py-1 text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-300" onClick={() => setIsMobileMenuOpen(false)}>
-            Free Training
+          <DropdownMenu.Root>
+            <DropdownMenu.Trigger asChild>
+              <button className="block w-full py-1 text-left text-gray-900 dark:text-white hover:bg-transparent hover:text-blue-600 dark:hover:text-blue-300 focus:outline-none">
+                <span className="flex items-center gap-1">
+                  Training <ChevronDown size={16} />
+                </span>
+              </button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Portal>
+              <DropdownMenu.Content className="bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 w-48 min-w-[180px] border border-gray-200 dark:border-gray-700 z-50">
+                <DropdownMenu.Item asChild>
+                  <Link href="/free-training" className="block px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900" onClick={() => setIsMobileMenuOpen(false)}>
+                    Free Training
+                  </Link>
+                </DropdownMenu.Item>
+                <DropdownMenu.Item asChild>
+                  <Link href="/premium-training" className="block px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900" onClick={() => setIsMobileMenuOpen(false)}>
+                    Premium Training
+                  </Link>
+                </DropdownMenu.Item>
+                <DropdownMenu.Item asChild>
+                  <Link href="/student-dashboard" className="block px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900" onClick={() => setIsMobileMenuOpen(false)}>
+                    Student Dashboard
+                  </Link>
+                </DropdownMenu.Item>
+              </DropdownMenu.Content>
+            </DropdownMenu.Portal>
+          </DropdownMenu.Root>
+          <Link href="/blogs" className="block py-1 text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-300" onClick={() => setIsMobileMenuOpen(false)}>
+            Blogs
           </Link>
           <Link href="/contact" className="block py-1 text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-300" onClick={() => setIsMobileMenuOpen(false)}>
             Contact
@@ -279,13 +336,13 @@ const Header = () => {
                       <span>System</span>
                     </DropdownMenu.Item>
                     <DropdownMenu.Item
-                      onSelect={() => setTheme('light')}
+                      onSelect={() => setTheme('dark')}
                       className="flex items-center gap-2 px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900"
                     >
                       <Sun size={16} className="text-yellow-400" /> Light
                     </DropdownMenu.Item>
                     <DropdownMenu.Item
-                      onSelect={() => setTheme('dark')}
+                      onSelect={() => setTheme('light')}
                       className="flex items-center gap-2 px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900"
                     >
                       <Moon size={16} className="text-gray-400 dark:text-white" /> Dark
