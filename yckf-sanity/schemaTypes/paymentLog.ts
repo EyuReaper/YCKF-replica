@@ -1,62 +1,118 @@
-export default {
+import {defineField, defineType} from 'sanity'
+
+export default defineType({
   name: 'paymentLog',
   title: 'Payment Log',
   type: 'document',
   fields: [
-    { name: 'transactionId', title: 'Transaction ID', type: 'string' },
-    { name: 'paymentMethod', title: 'Payment Method', type: 'string' },
-    { name: 'amount', title: 'Amount', type: 'number' },
-    { name: 'currency', title: 'Currency', type: 'string', initialValue: 'USD' },
-    { name: 'status', title: 'Status', type: 'string', options: {
-      list: [
-        { title: 'Pending', value: 'pending' },
-        { title: 'Processing', value: 'processing' },
-        { title: 'Completed', value: 'completed' },
-        { title: 'Failed', value: 'failed' },
-        { title: 'Cancelled', value: 'cancelled' },
-        { title: 'Refunded', value: 'refunded' }
-      ]
-    }},
-    { name: 'gateway', title: 'Payment Gateway', type: 'string' },
-    { name: 'gatewayTransactionId', title: 'Gateway Transaction ID', type: 'string' },
-    { name: 'gatewayResponse', title: 'Gateway Response', type: 'object' },
-    { name: 'enrollment', title: 'Enrollment', type: 'reference', to: [{ type: 'studentEnrollment' }] },
-    { name: 'user', title: 'User', type: 'reference', to: [{ type: 'user' }] },
-    { name: 'course', title: 'Course', type: 'reference', to: [{ type: 'premiumTraining' }] },
-    { name: 'donationTier', title: 'Donation Tier', type: 'string' },
-    { name: 'fees', title: 'Fees', type: 'object', fields: [
-      { name: 'processingFee', title: 'Processing Fee', type: 'number' },
-      { name: 'platformFee', title: 'Platform Fee', type: 'number' },
-      { name: 'totalFees', title: 'Total Fees', type: 'number' }
-    ]},
-    { name: 'refund', title: 'Refund', type: 'object', fields: [
-      { name: 'refundId', title: 'Refund ID', type: 'string' },
-      { name: 'refundAmount', title: 'Refund Amount', type: 'number' },
-      { name: 'refundReason', title: 'Refund Reason', type: 'string' },
-      { name: 'refundDate', title: 'Refund Date', type: 'datetime' },
-      { name: 'refundStatus', title: 'Refund Status', type: 'string' }
-    ]},
-    { name: 'ipAddress', title: 'IP Address', type: 'string' },
-    { name: 'userAgent', title: 'User Agent', type: 'string' },
-    { name: 'metadata', title: 'Metadata', type: 'object' },
-    { name: 'createdAt', title: 'Created At', type: 'datetime', initialValue: () => new Date().toISOString() },
-    { name: 'updatedAt', title: 'Updated At', type: 'datetime', initialValue: () => new Date().toISOString() }
+    defineField({
+      name: 'timestamp',
+      title: 'Timestamp',
+      type: 'datetime',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'userId',
+      title: 'User ID',
+      type: 'string',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'courseId',
+      title: 'Course ID',
+      type: 'string',
+    }),
+    defineField({
+      name: 'amount',
+      title: 'Amount',
+      type: 'number',
+      validation: (Rule) => Rule.required().min(0),
+    }),
+    defineField({
+      name: 'currency',
+      title: 'Currency',
+      type: 'string',
+      options: {
+        list: [
+          {title: 'GHS', value: 'ghs'},
+          {title: 'USD', value: 'usd'},
+        ],
+      },
+      initialValue: 'ghs',
+      validation: (Rule) => Rule.required(), // Updated: Make required and GHS/USD focused
+    }),
+    defineField({
+      name: 'status',
+      title: 'Status',
+      type: 'string',
+      options: {
+        list: [
+          {title: 'Pending', value: 'pending'},
+          {title: 'Success', value: 'success'},
+          {title: 'Failed', value: 'failed'},
+          {title: 'Refunded', value: 'refunded'},
+        ],
+      },
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'paymentMethod',
+      title: 'Payment Method',
+      type: 'string',
+      options: {
+        list: [
+          {title: 'Card', value: 'card'},
+          {title: 'PayPal', value: 'paypal'},
+          // Add more as needed
+        ],
+      },
+    }),
+    defineField({
+      name: 'gatewayResponse',
+      title: 'Gateway Response',
+      type: 'object',
+      fields: [
+        defineField({
+          name: 'transactionId',
+          title: 'Transaction ID',
+          type: 'string',
+          description: 'Unique ID from payment gateway',
+        }),
+      ],
+    }),
+    defineField({
+      name: 'metadata',
+      title: 'Metadata',
+      type: 'object',
+      fields: [
+        defineField({
+          name: 'notes',
+          title: 'Notes',
+          type: 'text',
+          description: 'Additional notes or custom data',
+        }),
+        defineField({ // New: For conversions
+          name: 'exchangeRate',
+          title: 'Exchange Rate',
+          type: 'number',
+          description: 'USD to GHS rate at transaction time',
+        }),
+      ],
+    }),
   ],
   preview: {
     select: {
-      transactionId: 'transactionId',
-      amount: 'amount',
+      timestamp: 'timestamp',
       status: 'status',
-      userEmail: 'user.email',
-      createdAt: 'createdAt'
+      amount: 'amount',
+      currency: 'currency',
     },
     prepare(selection) {
-      const { transactionId, amount, status, userEmail, createdAt } = selection;
+      const {timestamp, status, amount, currency} = selection
       return {
-        title: `$${amount} - ${transactionId}`,
-        subtitle: `${userEmail} • ${status} • ${new Date(createdAt).toLocaleDateString()}`,
-        media: status === 'completed' ? '✅' : status === 'failed' ? '❌' : '⏳'
-      };
-    }
-  }
-};
+        title: `${status} - ${amount} ${currency?.toUpperCase() || ''}`,
+        subtitle: timestamp ? new Date(timestamp).toLocaleString() : '',
+      }
+    },
+  },
+})
