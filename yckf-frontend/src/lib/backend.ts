@@ -1,3 +1,5 @@
+import { Currency } from "lucide-react";
+
 export const BACKEND_API_BASE = process.env.NEXT_PUBLIC_BACKEND_API_BASE || 'http://localhost:4000';
 
 async function request(path: string, options: RequestInit = {}) {
@@ -50,8 +52,21 @@ export const BackendApi = {
   },
 
   // Payments / Donations
-  donate(payload: { courseId: string; amount: number; paymentMethod: string; donor: { name: string; email: string; phone?: string }; tier?: string }) {
-    return request('/payments/donate', { method: 'POST', body: JSON.stringify(payload) });
+  donate(params: {
+    courseId: string;
+    amount: number;
+    currency?: 'GHS' | 'USD'; // supports dual currencies
+    paymentMethod: 'card' | 'mobile_money';
+    donor: { name: string; email: string; phone?: string }; // for MTN/Telecel
+    tier?: string;
+  }) {
+    return request('/payments/donate', { 
+      method: 'POST', 
+      body: JSON.stringify({ 
+        ...params, 
+        currency: params.currency || 'GHS' // default currency
+      }) 
+    });
   },
 
   // Certificates
@@ -67,5 +82,3 @@ export const BackendApi = {
     return request('/admin/analytics', { headers: { Authorization: `Bearer ${token}` } });
   },
 };
-
-
