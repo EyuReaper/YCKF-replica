@@ -6,7 +6,9 @@ import { client } from '@/lib/sanity';
 import { RiLoader2Fill } from 'react-icons/ri';
 import TopBar from '@/components/TopBar';
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
+import { BackendApi } from '@/lib/backend'; // New: For enrollment check
+import { useAuth } from '@/context/AuthContext'; // New: For user ID
 
 // Define interfaces
 interface CourseModule {
@@ -58,12 +60,39 @@ const SpinnerFallback = () => (
 
 export default function CourseLearningPage() {
   const params = useParams();
+  const router = useRouter(); // New: For redirect
+  const { user } = useAuth(); // New: For user ID in enrollment check
   const [course, setCourse] = useState<PremiumTrainingData | null>(null);
   const [progress, setProgress] = useState<ProgressData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [enrolled, setEnrolled] = useState<boolean | null>(null); // New: Enrollment status
   const [currentModule, setCurrentModule] = useState(0);
   const [currentLesson, setCurrentLesson] = useState(0);
   const [isUpdatingProgress, setIsUpdatingProgress] = useState(false);
+
+  // New: useEffect for access check (per diff – on page load)
+  useEffect(() => {
+    if (!user || !params.slug) return;
+
+    async function checkEnrollment() {
+      try {
+        // Query backend for enrollment (adjust endpoint as per backend)
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE}/enrollments?courseId=${params.slug}&userId=${user.id}`);
+        const enrollments = await response.json();
+        const hasEnrollment = enrollments.length > 0;
+        setEnrolled(hasEnrollment);
+
+        if (!hasEnrollment) {
+          router.push(`/premium-training/${params.slug}/enroll`); // Redirect if no enrollment
+        }
+      } catch (error) {
+        console.error('Error checking enrollment:', error);
+        router.push(`/premium-training/${params.slug}/enroll`); // Redirect on error
+      }
+    }
+
+    checkEnrollment();
+  }, [user, params.slug, router]);
 
   useEffect(() => {
     async function fetchCourseData() {
@@ -107,8 +136,10 @@ export default function CourseLearningPage() {
       }
     }
 
-    fetchCourseData();
-  }, [params.slug]);
+    if (enrolled !== false) { // Only fetch if enrolled (or loading)
+      fetchCourseData();
+    }
+  }, [params.slug, enrolled]);
 
   const updateProgress = async (moduleIndex: number, lessonIndex: number) => {
     if (!progress || !course) return;
@@ -204,7 +235,7 @@ export default function CourseLearningPage() {
         },
         body: JSON.stringify({
           progressId: progress._id,
-          studentName: 'Student Name', // In real app, get from auth
+          studentName: user?.name || 'Student Name', // Updated: Use user from auth
           courseTitle: course.title,
           completionDate: new Date().toISOString()
         }),
@@ -224,12 +255,12 @@ export default function CourseLearningPage() {
     }
   };
 
-  if (loading) {
+  if (loading || enrolled === null) {
     return (
       <div className="flex flex-col min-h-screen text-gray-900 bg-white dark:bg-gray-900 dark:text-gray-100">
         <TopBar/>
         <Header />
-        <main className="flex-1 flex items-center justify-center">
+        <main className="flex items-center justify-center flex-1">
           <SpinnerFallback />
         </main>
         <Footer />
@@ -237,15 +268,21 @@ export default function CourseLearningPage() {
     );
   }
 
-  if (!course) {
+  if (!course || !enrolled) {
     return (
       <div className="flex flex-col min-h-screen text-gray-900 bg-white dark:bg-gray-900 dark:text-gray-100">
         <TopBar/>
         <Header />
-        <main className="flex-1 flex items-center justify-center">
+        <main className="flex items-center justify-center flex-1">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Course not found</h1>
-            <p className="text-gray-600 dark:text-gray-400">The course you're looking for doesn't exist or is no longer available.</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Access Denied</h1>
+            <p className="text-gray-600 dark:text-gray-400">You need to enroll in this course to access the learning materials.</p>
+            <button
+              onClick={() => router.push(`/premium-training/${params.slug}/enroll`)}
+              className="px-4 py-2 mt-4 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+            >
+              Enroll Now
+            </button>
           </div>
         </main>
         <Footer />
@@ -263,13 +300,13 @@ export default function CourseLearningPage() {
       <main className="flex-1">
         <div className="flex h-screen">
           {/* Sidebar */}
-          <div className="w-80 bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-auto">
+          <div className="overflow-y-auto border-r border-gray-200 w-80 bg-gray-50 dark:bg-gray-800 dark:border-gray-700">
             <div className="p-4">
               <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Course Content</h2>
               
               {/* Progress Overview */}
               {progress && (
-                <div className="mb-6 p-4 bg-white rounded-lg shadow-sm dark:bg-gray-700">
+                <div className="p-4 mb-6 bg-white rounded-lg shadow-sm dark:bg-gray-700">
                   <h3 className="mb-2 text-sm font-medium text-gray-900 dark:text-gray-100">Overall Progress</h3>
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-sm text-gray-600 dark:text-gray-400">{progress.overallProgress}%</span>
@@ -277,9 +314,9 @@ export default function CourseLearningPage() {
                       {Math.round(progress.totalTimeSpent / 60)}h
                     </span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-600">
+                  <div className="w-full h-2 bg-gray-200 rounded-full dark:bg-gray-600">
                     <div 
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      className="h-2 transition-all duration-300 bg-blue-600 rounded-full"
                       style={{ width: `${progress.overallProgress}%` }}
                     ></div>
                   </div>
@@ -377,7 +414,7 @@ export default function CourseLearningPage() {
           </div>
 
           {/* Main Content */}
-          <div className="flex-1 flex flex-col">
+          <div className="flex flex-col flex-1">
             {/* Header */}
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
@@ -392,7 +429,7 @@ export default function CourseLearningPage() {
                 {progress?.certificateEligible && !progress.certificateIssued && (
                   <button
                     onClick={requestCertificate}
-                    className="px-4 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors duration-200"
+                    className="px-4 py-2 text-white transition-colors duration-200 bg-green-600 rounded-lg hover:bg-green-700"
                   >
                     Request Certificate
                   </button>
@@ -401,7 +438,7 @@ export default function CourseLearningPage() {
                   <a
                     href={progress.certificateUrl}
                     target="_blank"
-                    className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                    className="px-4 py-2 text-white transition-colors duration-200 bg-blue-600 rounded-lg hover:bg-blue-700"
                   >
                     View Certificate
                   </a>
@@ -419,25 +456,25 @@ export default function CourseLearningPage() {
                   
                   {/* Mock lesson content */}
                   <div className="prose dark:prose-invert max-w-none">
-                    <p className="text-gray-600 dark:text-gray-400 mb-6">
+                    <p className="mb-6 text-gray-600 dark:text-gray-400">
                       This is a sample lesson content for <strong>{currentLessonData}</strong>. 
                       In a real application, this would contain the actual course material, 
                       videos, interactive content, and assessments.
                     </p>
                     
-                    <div className="bg-blue-50 dark:bg-blue-900 p-6 rounded-lg mb-6">
-                      <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                    <div className="p-6 mb-6 rounded-lg bg-blue-50 dark:bg-blue-900">
+                      <h3 className="mb-2 text-lg font-semibold text-blue-900 dark:text-blue-100">
                         Learning Objectives
                       </h3>
-                      <ul className="text-blue-800 dark:text-blue-200 space-y-1">
+                      <ul className="space-y-1 text-blue-800 dark:text-blue-200">
                         <li>• Understand the key concepts covered in this lesson</li>
                         <li>• Apply the knowledge in practical scenarios</li>
                         <li>• Complete the lesson assessment</li>
                       </ul>
                     </div>
 
-                    <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                    <div className="p-6 rounded-lg bg-gray-50 dark:bg-gray-800">
+                      <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
                         Lesson Content
                       </h3>
                       <p className="text-gray-600 dark:text-gray-400">
@@ -449,7 +486,7 @@ export default function CourseLearningPage() {
                   </div>
 
                   {/* Lesson Actions */}
-                  <div className="mt-8 flex justify-between">
+                  <div className="flex justify-between mt-8">
                     <button
                       onClick={() => {
                         if (currentLesson > 0) {
@@ -460,7 +497,7 @@ export default function CourseLearningPage() {
                         }
                       }}
                       disabled={currentModule === 0 && currentLesson === 0}
-                      className="px-6 py-2 text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                      className="px-6 py-2 text-gray-600 transition-colors duration-200 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
                     >
                       Previous
                     </button>
@@ -468,7 +505,7 @@ export default function CourseLearningPage() {
                     <button
                       onClick={() => updateProgress(currentModule, currentLesson)}
                       disabled={isUpdatingProgress}
-                      className="px-6 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                      className="px-6 py-2 text-white transition-colors duration-200 bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isUpdatingProgress ? 'Marking Complete...' : 'Mark as Complete'}
                     </button>
@@ -483,7 +520,7 @@ export default function CourseLearningPage() {
                         }
                       }}
                       disabled={currentModule === course.modules.length - 1 && currentLesson === currentModuleData.lessons.length - 1}
-                      className="px-6 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                      className="px-6 py-2 text-white transition-colors duration-200 bg-green-600 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Next
                     </button>
