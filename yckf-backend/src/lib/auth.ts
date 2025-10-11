@@ -1,18 +1,25 @@
+
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { sanity } from './sanity.js';
+
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is required'); // Fixed: Early env check
+}
+
+const SALT_ROUNDS = parseInt(process.env.BCRYPT_SALT_ROUNDS || '12'); // Fixed: Configurable salt
 
 export type Role = 'student' | 'secondary_admin' | 'master_admin';
 
 export const Auth = {
   sign(payload: { userId: string; email: string; role: Role }) {
-    return jwt.sign(payload, process.env.JWT_SECRET || 'change-me', { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
+    return jwt.sign(payload, process.env.JWT_SECRET!, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
   },
   verify(token: string) {
-    return jwt.verify(token, process.env.JWT_SECRET || 'change-me') as { userId: string; email: string; role: Role };
+    return jwt.verify(token, process.env.JWT_SECRET!) as { userId: string; email: string; role: Role };
   },
   async hash(password: string) {
-    return bcrypt.hash(password, 12);
+    return bcrypt.hash(password, SALT_ROUNDS); // Fixed: Use configurable rounds
   },
   async compare(password: string, hash: string) {
     return bcrypt.compare(password, hash);
@@ -37,5 +44,3 @@ export function requireRole(required: Role[]) {
     }
   };
 }
-
-

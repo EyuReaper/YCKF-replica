@@ -1,3 +1,4 @@
+
 import { sanity } from './sanity.js';
 
 export async function auditLog(entry: {
@@ -29,8 +30,6 @@ export async function auditLog(entry: {
     });
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.error('auditLog error', e);
+    console.warn('auditLog warning (non-blocking):', e); // Fixed: Warn instead of error for resilience
   }
 }
-
-
