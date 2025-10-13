@@ -13,8 +13,8 @@ import { router as certificatesRouter } from './routes/certificates.js'; // Note
 import { router as adminRouter } from './routes/admin.js';
 import { router as enrollmentsRouter } from './routes/enrollments.js'; // New
 import { router as progressRouter } from './routes/progress.js'; // New
+import { router as botsRouter } from './routes/bots.js'; // New (for bots integration)// Configuration Imports
 
-// Configuration Imports
 import { connectDB } from './config/database.js'; // Database connection
 import { corsMiddleware } from './config/cors.js'; // CORS setup
 
@@ -54,6 +54,7 @@ async function startServer() {
     app.use('/api/admin', adminRouter);
     app.use('/api/enrollments', enrollmentsRouter); // New: Enrollment management
     app.use('/api/progress', progressRouter); // New: Progress tracking
+    app.use('/api/bots', botsRouter); // New: Bot webhooks (WhatsApp/Telegram)
 
     // 6. Global Error Handler (catches unhandled errors)
     app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
