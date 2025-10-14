@@ -27,19 +27,20 @@ export default function TopBar() {
     timeZone: 'Africa/Addis_Ababa',
   });
 
-  // Apply theme-aware styles
-  const textColor = theme === 'dark' ? 'text-white' : 'text-gray-900';
-  const bgColor = theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200';
+  // Theme-based class definitions (matching Footer style)
+  const bgClass = theme === 'light' ? 'bg-gray-200' : 'bg-gray-800';
+  const textClass = theme === 'light' ? 'text-gray-900' : 'text-white';
+  const linkHoverClass = theme === 'light' ? 'hover:text-blue-600' : 'hover:text-blue-400';
 
   return (
-    <div className={`${bgColor} ${textColor} py-2 text-center`}>
-      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center px-4 text-sm">
+    <div className={`${bgClass} ${textClass} py-2 text-center`}>
+      <div className="flex flex-col items-center justify-between px-4 mx-auto text-sm max-w-7xl sm:flex-row">
         <div className="mb-2 sm:mb-0">
           <span>Welcome to YCKF! | </span>
           <span>{formattedDate} | {formattedTime} EAT</span>
         </div>
         <div>
-          <a href="/contact" className={`underline hover:${theme === 'dark' ? 'text-blue-300' : 'text-blue-600'} ml-2`}>
+          <a href="/contact" className={`underline ${linkHoverClass} ml-2`}>
             Contact Us
           </a>
         </div>

@@ -23,6 +23,7 @@ const Header = () => {
   const dropdownItemClass = theme === 'light' ? 'text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700' : 'text-gray-100 hover:bg-gray-700';
   const mobileMenuBgClass = theme === 'light' ? 'bg-white' : 'bg-gray-900';
   const searchInputClass = theme === 'light' ? 'text-gray-900 placeholder-gray-400 bg-white border-gray-300' : 'text-white placeholder-gray-400 bg-gray-700 border-gray-600';
+  const dialogBgClass = theme === 'light' ? 'bg-white' : 'bg-gray-800';
 
   // Sync theme with document class on client mount
   useEffect(() => {
@@ -146,7 +147,7 @@ const Header = () => {
             <Dialog.Trigger asChild>
               <motion.button
                 whileHover={{ scale: 1.1 }}
-                className={`p-2 ${secondaryTextClass} hover:text-blue-600 dark:hover:text-blue-300 focus:outline-none`}
+                className={`p-2 ${secondaryTextClass} focus:outline-none ${linkHoverClass}`}
                 aria-label="Open search"
               >
                 <Search size={20} />
@@ -154,7 +155,7 @@ const Header = () => {
             </Dialog.Trigger>
             <Dialog.Portal>
               <Dialog.Overlay className="fixed inset-0 bg-black/50" />
-              <Dialog.Content className="fixed z-50 w-full max-w-md p-6 -translate-x-1/2 -translate-y-1/2 bg-white rounded-md top-1/2 left-1/2 dark:bg-gray-800">
+              <Dialog.Content className={`fixed z-50 w-full max-w-md p-6 -translate-x-1/2 -translate-y-1/2 ${dialogBgClass} rounded-md top-1/2 left-1/2`}>
                 <Dialog.Title className={`mb-4 text-xl font-semibold ${textClass}`}>Search</Dialog.Title>
                 <div className="relative">
                   <input
@@ -162,12 +163,14 @@ const Header = () => {
                     placeholder="Search..."
                     className={`${searchInputClass} w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400`}
                   />
-                  <button className={`absolute ${mutedTextClass} -translate-y-1/2 right-2 top-1/2`}>
+                  <button className={`absolute ${mutedTextClass} -translate-y-1/2 right-2 top-1/2 ${linkHoverClass}`}>
                     <Search size={16} />
                   </button>
                 </div>
                 <Dialog.Close asChild>
-                  <button className={`mt-4 ${secondaryTextClass} hover:${linkHoverClass}`}>Close</button>
+                  <button className={`mt-4 ${secondaryTextClass} ${linkHoverClass}`}>
+                    Close
+                  </button>
                 </Dialog.Close>
               </Dialog.Content>
             </Dialog.Portal>
@@ -215,151 +218,151 @@ const Header = () => {
             </DropdownMenu.Root>
           </Toggle.Root>
         </div>
-      </div>
-      {isMobileMenuOpen && (
-        <div className={`${mobileMenuBgClass} p-4 space-y-3 text-center md:hidden`}>
-          <Link href="/" className={`block py-1 ${linkHoverClass}`} onClick={() => setIsMobileMenuOpen(false)}>
-            Home
-          </Link>
-          <DropdownMenu.Root>
-            <DropdownMenu.Trigger asChild>
-              <button className={`block w-full py-1 text-left ${linkHoverClass} focus:outline-none`}>
-                <span className="flex items-center gap-1">Company <ChevronDown size={16} /></span>
-              </button>
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Portal>
-              <DropdownMenu.Content className={`${dropdownBgClass} rounded-md shadow-lg py-1 w-48 min-w-[180px] z-50`}>
-                <DropdownMenu.Item asChild>
-                  <Link href="/about" className={`block px-4 py-2 ${dropdownItemClass}`} onClick={() => setIsMobileMenuOpen(false)}>
-                    About
-                  </Link>
-                </DropdownMenu.Item>
-                <DropdownMenu.Item asChild>
-                  <Link href="/team" className={`block px-4 py-2 ${dropdownItemClass}`} onClick={() => setIsMobileMenuOpen(false)}>
-                    Team
-                  </Link>
-                </DropdownMenu.Item>
-                <DropdownMenu.Item asChild>
-                  <Link href="/interns" className={`block px-4 py-2 ${dropdownItemClass}`} onClick={() => setIsMobileMenuOpen(false)}>
-                    Interns
-                  </Link>
-                </DropdownMenu.Item>
-                <DropdownMenu.Item asChild>
-                  <Link href="/volunteers" className={`block px-4 py-2 ${dropdownItemClass}`} onClick={() => setIsMobileMenuOpen(false)}>
-                    Volunteers
-                  </Link>
-                </DropdownMenu.Item>
-                <DropdownMenu.Item asChild>
-                  <Link href="/top-performers" className={`block px-4 py-2 ${dropdownItemClass}`} onClick={() => setIsMobileMenuOpen(false)}>
-                    Top Performers
-                  </Link>
-                </DropdownMenu.Item>
-                <DropdownMenu.Item asChild>
-                  <Link href="/events" className={`block px-4 py-2 ${dropdownItemClass}`} onClick={() => setIsMobileMenuOpen(false)}>
-                    Events
-                  </Link>
-                </DropdownMenu.Item>
-                <DropdownMenu.Item asChild>
-                  <Link href="/careers" className={`block px-4 py-2 ${dropdownItemClass}`} onClick={() => setIsMobileMenuOpen(false)}>
-                    Careers
-                  </Link>
-                </DropdownMenu.Item>
-              </DropdownMenu.Content>
-            </DropdownMenu.Portal>
-          </DropdownMenu.Root>
-          <DropdownMenu.Root>
-            <DropdownMenu.Trigger asChild>
-              <button className={`block w-full py-1 text-left ${linkHoverClass} focus:outline-none`}>
-                <span className="flex items-center gap-1">Training <ChevronDown size={16} /></span>
-              </button>
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Portal>
-              <DropdownMenu.Content className={`${dropdownBgClass} rounded-md shadow-lg py-1 w-48 min-w-[180px] z-50`}>
-                <DropdownMenu.Item asChild>
-                  <Link href="/free-training" className={`block px-4 py-2 ${dropdownItemClass}`} onClick={() => setIsMobileMenuOpen(false)}>
-                    Free Training
-                  </Link>
-                </DropdownMenu.Item>
-                <DropdownMenu.Item asChild>
-                  <Link href="/premium-training" className={`block px-4 py-2 ${dropdownItemClass}`} onClick={() => setIsMobileMenuOpen(false)}>
-                    Premium Training
-                  </Link>
-                </DropdownMenu.Item>
-                <DropdownMenu.Item asChild>
-                  <Link href="/student-dashboard" className={`block px-4 py-2 ${dropdownItemClass}`} onClick={() => setIsMobileMenuOpen(false)}>
-                    Student Dashboard
-                  </Link>
-                </DropdownMenu.Item>
-              </DropdownMenu.Content>
-            </DropdownMenu.Portal>
-          </DropdownMenu.Root>
-          <Link href="/blogs" className={`block py-1 ${linkHoverClass}`} onClick={() => setIsMobileMenuOpen(false)}>
-            Blogs
-          </Link>
-          <Link href="/contact" className={`block py-1 ${linkHoverClass}`} onClick={() => setIsMobileMenuOpen(false)}>
-            Contact
-          </Link>
-          <Link href="/complaints" className={`block py-1 ${linkHoverClass}`} onClick={() => setIsMobileMenuOpen(false)}>
-            Complaints
-          </Link>
-          <div className="mt-4">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search..."
-                className={`${searchInputClass} w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400`}
-              />
-              <button className={`absolute ${mutedTextClass} -translate-y-1/2 right-2 top-1/2`}>
-                <Search size={16} />
-              </button>
+        {isMobileMenuOpen && (
+          <div className={`${mobileMenuBgClass} p-4 space-y-3 text-center md:hidden`}>
+            <Link href="/" className={`block py-1 ${linkHoverClass}`} onClick={() => setIsMobileMenuOpen(false)}>
+              Home
+            </Link>
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger asChild>
+                <button className={`block w-full py-1 text-left ${linkHoverClass} focus:outline-none`}>
+                  <span className="flex items-center gap-1">Company <ChevronDown size={16} /></span>
+                </button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Portal>
+                <DropdownMenu.Content className={`${dropdownBgClass} rounded-md shadow-lg py-1 w-48 min-w-[180px] z-50`}>
+                  <DropdownMenu.Item asChild>
+                    <Link href="/about" className={`block px-4 py-2 ${dropdownItemClass}`} onClick={() => setIsMobileMenuOpen(false)}>
+                      About
+                    </Link>
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item asChild>
+                    <Link href="/team" className={`block px-4 py-2 ${dropdownItemClass}`} onClick={() => setIsMobileMenuOpen(false)}>
+                      Team
+                    </Link>
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item asChild>
+                    <Link href="/interns" className={`block px-4 py-2 ${dropdownItemClass}`} onClick={() => setIsMobileMenuOpen(false)}>
+                      Interns
+                    </Link>
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item asChild>
+                    <Link href="/volunteers" className={`block px-4 py-2 ${dropdownItemClass}`} onClick={() => setIsMobileMenuOpen(false)}>
+                      Volunteers
+                    </Link>
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item asChild>
+                    <Link href="/top-performers" className={`block px-4 py-2 ${dropdownItemClass}`} onClick={() => setIsMobileMenuOpen(false)}>
+                      Top Performers
+                    </Link>
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item asChild>
+                    <Link href="/events" className={`block px-4 py-2 ${dropdownItemClass}`} onClick={() => setIsMobileMenuOpen(false)}>
+                      Events
+                    </Link>
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item asChild>
+                    <Link href="/careers" className={`block px-4 py-2 ${dropdownItemClass}`} onClick={() => setIsMobileMenuOpen(false)}>
+                      Careers
+                    </Link>
+                  </DropdownMenu.Item>
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
+            </DropdownMenu.Root>
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger asChild>
+                <button className={`block w-full py-1 text-left ${linkHoverClass} focus:outline-none`}>
+                  <span className="flex items-center gap-1">Training <ChevronDown size={16} /></span>
+                </button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Portal>
+                <DropdownMenu.Content className={`${dropdownBgClass} rounded-md shadow-lg py-1 w-48 min-w-[180px] z-50`}>
+                  <DropdownMenu.Item asChild>
+                    <Link href="/free-training" className={`block px-4 py-2 ${dropdownItemClass}`} onClick={() => setIsMobileMenuOpen(false)}>
+                      Free Training
+                    </Link>
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item asChild>
+                    <Link href="/premium-training" className={`block px-4 py-2 ${dropdownItemClass}`} onClick={() => setIsMobileMenuOpen(false)}>
+                      Premium Training
+                    </Link>
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item asChild>
+                    <Link href="/student-dashboard" className={`block px-4 py-2 ${dropdownItemClass}`} onClick={() => setIsMobileMenuOpen(false)}>
+                      Student Dashboard
+                    </Link>
+                  </DropdownMenu.Item>
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
+            </DropdownMenu.Root>
+            <Link href="/blogs" className={`block py-1 ${linkHoverClass}`} onClick={() => setIsMobileMenuOpen(false)}>
+              Blogs
+            </Link>
+            <Link href="/contact" className={`block py-1 ${linkHoverClass}`} onClick={() => setIsMobileMenuOpen(false)}>
+              Contact
+            </Link>
+            <Link href="/complaints" className={`block py-1 ${linkHoverClass}`} onClick={() => setIsMobileMenuOpen(false)}>
+              Complaints
+            </Link>
+            <div className="mt-4">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className={`${searchInputClass} w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400`}
+                />
+                <button className={`absolute ${mutedTextClass} -translate-y-1/2 right-2 top-1/2 ${linkHoverClass}`}>
+                  <Search size={16} />
+                </button>
+              </div>
+            </div>
+            <div className="flex items-center pt-3 space-x-4">
+              <Toggle.Root
+                pressed={theme === 'dark'}
+                onPressedChange={() => {
+                  const newTheme = theme === 'dark' ? 'light' : 'dark';
+                  setTheme(newTheme);
+                }}
+                className={`relative p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+              >
+                <DropdownMenu.Root>
+                  <DropdownMenu.Trigger asChild>
+                    <motion.span
+                      animate={{ rotate: theme === 'dark' ? 180 : 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="flex items-center"
+                    >
+                      {theme === 'dark' ? <Sun size={20} className="text-yellow-400" /> : <Moon size={20} className={`${mutedTextClass}`} />}
+                    </motion.span>
+                  </DropdownMenu.Trigger>
+                  <DropdownMenu.Portal>
+                    <DropdownMenu.Content className={`${dropdownBgClass} absolute right-0 z-50 w-32 py-2 mt-2 rounded-md shadow-lg`}>
+                      <DropdownMenu.Item
+                        onSelect={() => setTheme('system')}
+                        className={`flex items-center gap-2 px-4 py-2 ${dropdownItemClass}`}
+                      >
+                        <span>System</span>
+                      </DropdownMenu.Item>
+                      <DropdownMenu.Item
+                        onSelect={() => setTheme('light')}
+                        className={`flex items-center gap-2 px-4 py-2 ${dropdownItemClass}`}
+                      >
+                        <Sun size={16} className="text-yellow-400" /> Light
+                      </DropdownMenu.Item>
+                      <DropdownMenu.Item
+                        onSelect={() => setTheme('dark')}
+                        className={`flex items-center gap-2 px-4 py-2 ${dropdownItemClass}`}
+                      >
+                        <Moon size={16} className={`${mutedTextClass}`} /> Dark
+                      </DropdownMenu.Item>
+                    </DropdownMenu.Content>
+                  </DropdownMenu.Portal>
+                </DropdownMenu.Root>
+              </Toggle.Root>
             </div>
           </div>
-          <div className="flex items-center pt-3 space-x-4">
-            <Toggle.Root
-              pressed={theme === 'dark'}
-              onPressedChange={() => {
-                const newTheme = theme === 'dark' ? 'light' : 'dark';
-                setTheme(newTheme);
-              }}
-              className={`relative p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500`}
-            >
-              <DropdownMenu.Root>
-                <DropdownMenu.Trigger asChild>
-                  <motion.span
-                    animate={{ rotate: theme === 'dark' ? 180 : 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="flex items-center"
-                  >
-                    {theme === 'dark' ? <Sun size={20} className="text-yellow-400" /> : <Moon size={20} className={`${mutedTextClass}`} />}
-                  </motion.span>
-                </DropdownMenu.Trigger>
-                <DropdownMenu.Portal>
-                  <DropdownMenu.Content className={`${dropdownBgClass} absolute right-0 z-50 w-32 py-2 mt-2 rounded-md shadow-lg`}>
-                    <DropdownMenu.Item
-                      onSelect={() => setTheme('system')}
-                      className={`flex items-center gap-2 px-4 py-2 ${dropdownItemClass}`}
-                    >
-                      <span>System</span>
-                    </DropdownMenu.Item>
-                    <DropdownMenu.Item
-                      onSelect={() => setTheme('light')}
-                      className={`flex items-center gap-2 px-4 py-2 ${dropdownItemClass}`}
-                    >
-                      <Sun size={16} className="text-yellow-400" /> Light
-                    </DropdownMenu.Item>
-                    <DropdownMenu.Item
-                      onSelect={() => setTheme('dark')}
-                      className={`flex items-center gap-2 px-4 py-2 ${dropdownItemClass}`}
-                    >
-                      <Moon size={16} className={`${mutedTextClass}`} /> Dark
-                    </DropdownMenu.Item>
-                  </DropdownMenu.Content>
-                </DropdownMenu.Portal>
-              </DropdownMenu.Root>
-            </Toggle.Root>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </header>
   );
 };
