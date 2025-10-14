@@ -316,7 +316,7 @@ const Header = () => {
                 </button>
               </div>
             </div>
-            <div className="flex items-center pt-3 space-x-4">
+            <div className="flex items-center justify-center pt-3 space-x-4">
               <Toggle.Root
                 pressed={theme === 'dark'}
                 onPressedChange={() => {
