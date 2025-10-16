@@ -14,5 +14,7 @@ import courseProgress from './courseProgress';
 import user from './user';
 import auditLog from './auditLog';
 import paymentLog from './paymentLog';
+import faq from './faq';
 
-export const schemaTypes = [about, testimonial, careers, events, interns, team, topPerformers, volunteers, freeTraining, Blogs, premiumTraining, studentEnrollment, courseProgress, user, auditLog, paymentLog]; 
+
+export const schemaTypes = [about, testimonial, careers, events, interns, team, topPerformers, volunteers, freeTraining, Blogs, premiumTraining, studentEnrollment, courseProgress, user, auditLog, paymentLog, faq]; 
