@@ -1,4 +1,4 @@
-'use client'; 
+'use client';
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -132,17 +132,17 @@ const Header = () => {
             Complaints
           </Link>
         </nav>
-        <div className="md:hidden">
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className={`text-2xl ${textClass} hover:${textClass.replace('text-', 'text-gray-700 dark:text-')} focus:outline-none`}
-            aria-label="Toggle menu"
-          >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </motion.button>
-        </div>
-        <div className="items-center hidden space-x-4 md:flex">
+        <div className="flex items-center space-x-4">
+          <div className="md:hidden">
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className={`text-2xl ${textClass} hover:${textClass.replace('text-', 'text-gray-700 dark:text-')} focus:outline-none`}
+              aria-label="Toggle menu"
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </motion.button>
+          </div>
           <Dialog.Root>
             <Dialog.Trigger asChild>
               <motion.button
@@ -181,7 +181,7 @@ const Header = () => {
               const newTheme = theme === 'dark' ? 'light' : 'dark';
               setTheme(newTheme);
             }}
-            className={`relative p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+            className={`relative p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 hidden md:flex`}
           >
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
@@ -219,13 +219,21 @@ const Header = () => {
           </Toggle.Root>
         </div>
         {isMobileMenuOpen && (
-          <div className={`${mobileMenuBgClass} p-4 space-y-3 text-center md:hidden`}>
-            <Link href="/" className={`block py-1 ${linkHoverClass}`} onClick={() => setIsMobileMenuOpen(false)}>
+          <div className={`${mobileMenuBgClass} fixed inset-0 z-40 p-6 pt-16 space-y-4 text-center md:hidden`}>
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={`absolute top-4 right-4 ${textClass} hover:${textClass.replace('text-', 'text-gray-700 dark:text-')} focus:outline-none`}
+              aria-label="Close menu"
+            >
+              <X size={24} />
+            </motion.button>
+            <Link href="/" className={`block w-full py-3 font-semibold ${linkHoverClass}`} onClick={() => setIsMobileMenuOpen(false)}>
               Home
             </Link>
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
-                <button className={`block w-full py-1 text-left ${linkHoverClass} focus:outline-none`}>
+                <button className={`block w-full py-3 text-left font-semibold ${linkHoverClass} focus:outline-none`}>
                   <span className="flex items-center gap-1">Company <ChevronDown size={16} /></span>
                 </button>
               </DropdownMenu.Trigger>
@@ -271,7 +279,7 @@ const Header = () => {
             </DropdownMenu.Root>
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
-                <button className={`block w-full py-1 text-left ${linkHoverClass} focus:outline-none`}>
+                <button className={`block w-full py-3 text-left font-semibold ${linkHoverClass} focus:outline-none`}>
                   <span className="flex items-center gap-1">Training <ChevronDown size={16} /></span>
                 </button>
               </DropdownMenu.Trigger>
@@ -295,71 +303,53 @@ const Header = () => {
                 </DropdownMenu.Content>
               </DropdownMenu.Portal>
             </DropdownMenu.Root>
-            <Link href="/blogs" className={`block py-1 ${linkHoverClass}`} onClick={() => setIsMobileMenuOpen(false)}>
+            <Link href="/blogs" className={`block w-full py-3 font-semibold ${linkHoverClass}`} onClick={() => setIsMobileMenuOpen(false)}>
               Blogs
             </Link>
-            <Link href="/contact" className={`block py-1 ${linkHoverClass}`} onClick={() => setIsMobileMenuOpen(false)}>
+            <Link href="/contact" className={`block w-full py-3 font-semibold ${linkHoverClass}`} onClick={() => setIsMobileMenuOpen(false)}>
               Contact
             </Link>
-            <Link href="/complaints" className={`block py-1 ${linkHoverClass}`} onClick={() => setIsMobileMenuOpen(false)}>
+            <Link href="/complaints" className={`block w-full py-3 font-semibold ${linkHoverClass}`} onClick={() => setIsMobileMenuOpen(false)}>
               Complaints
             </Link>
-            <div className="mt-4">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  className={`${searchInputClass} w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400`}
-                />
-                <button className={`absolute ${mutedTextClass} -translate-y-1/2 right-2 top-1/2 ${linkHoverClass}`}>
-                  <Search size={16} />
-                </button>
-              </div>
-            </div>
-            <div className="flex items-center justify-center pt-3 space-x-4">
-              <Toggle.Root
-                pressed={theme === 'dark'}
-                onPressedChange={() => {
-                  const newTheme = theme === 'dark' ? 'light' : 'dark';
-                  setTheme(newTheme);
-                }}
-                className={`relative p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500`}
-              >
-                <DropdownMenu.Root>
-                  <DropdownMenu.Trigger asChild>
-                    <motion.span
-                      animate={{ rotate: theme === 'dark' ? 180 : 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="flex items-center"
+            <Toggle.Root
+              pressed={theme === 'dark'}
+              onPressedChange={() => {
+                const newTheme = theme === 'dark' ? 'light' : 'dark';
+                setTheme(newTheme);
+              }}
+              className={`relative p-2 rounded-md w-full text-left font-semibold ${linkHoverClass} focus:outline-none`}
+            >
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger asChild>
+                  <span className="flex items-center gap-2 py-3">
+                    Theme {theme === 'dark' ? <Sun size={20} className="text-yellow-400" /> : <Moon size={20} className={`${mutedTextClass}`} />}
+                  </span>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Portal>
+                  <DropdownMenu.Content className={`${dropdownBgClass} rounded-md shadow-lg py-1 w-48 min-w-[180px] z-50`}>
+                    <DropdownMenu.Item
+                      onSelect={() => setTheme('system')}
+                      className={`flex items-center gap-2 px-4 py-2 ${dropdownItemClass}`}
                     >
-                      {theme === 'dark' ? <Sun size={20} className="text-yellow-400" /> : <Moon size={20} className={`${mutedTextClass}`} />}
-                    </motion.span>
-                  </DropdownMenu.Trigger>
-                  <DropdownMenu.Portal>
-                    <DropdownMenu.Content className={`${dropdownBgClass} absolute right-0 z-50 w-32 py-2 mt-2 rounded-md shadow-lg`}>
-                      <DropdownMenu.Item
-                        onSelect={() => setTheme('system')}
-                        className={`flex items-center gap-2 px-4 py-2 ${dropdownItemClass}`}
-                      >
-                        <span>System</span>
-                      </DropdownMenu.Item>
-                      <DropdownMenu.Item
-                        onSelect={() => setTheme('light')}
-                        className={`flex items-center gap-2 px-4 py-2 ${dropdownItemClass}`}
-                      >
-                        <Sun size={16} className="text-yellow-400" /> Light
-                      </DropdownMenu.Item>
-                      <DropdownMenu.Item
-                        onSelect={() => setTheme('dark')}
-                        className={`flex items-center gap-2 px-4 py-2 ${dropdownItemClass}`}
-                      >
-                        <Moon size={16} className={`${mutedTextClass}`} /> Dark
-                      </DropdownMenu.Item>
-                    </DropdownMenu.Content>
-                  </DropdownMenu.Portal>
-                </DropdownMenu.Root>
-              </Toggle.Root>
-            </div>
+                      <span>System</span>
+                    </DropdownMenu.Item>
+                    <DropdownMenu.Item
+                      onSelect={() => setTheme('light')}
+                      className={`flex items-center gap-2 px-4 py-2 ${dropdownItemClass}`}
+                    >
+                      <Sun size={16} className="text-yellow-400" /> Light
+                    </DropdownMenu.Item>
+                    <DropdownMenu.Item
+                      onSelect={() => setTheme('dark')}
+                      className={`flex items-center gap-2 px-4 py-2 ${dropdownItemClass}`}
+                    >
+                      <Moon size={16} className={`${mutedTextClass}`} /> Dark
+                    </DropdownMenu.Item>
+                  </DropdownMenu.Content>
+                </DropdownMenu.Portal>
+              </DropdownMenu.Root>
+            </Toggle.Root>
           </div>
         )}
       </div>
