@@ -77,7 +77,7 @@ export default async function Team() {
                       <img
                         src={member.image.asset.url}
                         alt={member.name}
-                        className="object-cover w-full h-48 mb-4 rounded-lg"
+                        className="object-cover w-full mb-4 rounded-lg h-49"
                       />
                     )}
                     <h3 className="mb-2 text-xl font-bold text-gray-900 dark:text-gray-100">{member.name}</h3>

@@ -97,12 +97,13 @@ export default async function Interns() {
             {interns.length > 0 ? (
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 {interns.map((intern, index) => (
-                  <div key={index} className="relative p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
+                  <div key={index}  className="relative flex items-center p-4 space-x-4 bg-white rounded-lg shadow-md dark:bg-gray-800"
+>
                     {intern.image?.asset && (
                       <img
                         src={intern.image.asset.url}
                         alt={intern.name}
-                        className="object-cover w-full h-48 mb-4 rounded-lg"
+                        className="object-cover w-24 h-40 mb-4 rounded-lg "
                       />
                     )}
                     <span className="absolute px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded-full top-4 left-4">

@@ -48,7 +48,7 @@ export default async function Events() {
 
   return (
     <div className="flex flex-col min-h-screen text-gray-900 bg-white dark:bg-gray-900 dark:text-gray-100">
-      <Topbar/>
+      <TopBar/>
       <Header />
       <main className="flex-1">
         {/* Header Section with Background Image */}

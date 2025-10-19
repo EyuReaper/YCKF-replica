@@ -10,5 +10,7 @@ export default {
     { name: 'instructor', title: 'Instructor', type: 'string' },
     { name: 'registrationUrl', title: 'Registration URL', type: 'url' },
     { name: 'image', title: 'Training Image', type: 'image', options: { hotspot: true } },
+    { name: 'capacity', title: 'Capacity', type: 'string' }, // e.g., "50 seats"
+    { name: 'location', title: 'Location', type: 'string' }, // e.g., "Online"
   ],
 };
