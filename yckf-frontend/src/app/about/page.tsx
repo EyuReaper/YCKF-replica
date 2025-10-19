@@ -33,28 +33,22 @@ const SpinnerFallback = () => (
 );
 
 async function getAboutData(): Promise<AboutData> {
-  const query = `*[_type == "about"][0] {
-    title,
-    description,
-    image {
-      asset->{
-        _id,
-        url,
-        _type
-      }
-    },
-    whoWeAre,
-    mission,
-    vision,
-    story,
-    coreValues[] {
-      value
-    },
-    history,
-    historyMilestones[] {
-      milestone
+const query = `*[_type == "about"][0] {
+  title,
+  description,
+  image {
+    asset->{
+      url
     }
-  }`;
+  },
+  whoWeAre,
+  mission,
+  vision,
+  story,
+  coreValues,
+  history,
+  historyMilestones
+}`;
   const data = await client.fetch(query); // Reverted to client.fetch as sanity is undefined
   console.log('Full About Data:', JSON.stringify(data, null, 2)); // Detailed log
   return {
@@ -130,14 +124,13 @@ export default async function About() {
             <h2 className="mb-6 text-3xl font-semibold text-center text-gray-900 dark:text-gray-100">Our Story</h2>
             <div className="mb-6 text-lg text-gray-600 dark:text-gray-400">{data.story || <SpinnerFallback />}</div>
             <h2 className="mb-6 text-3xl font-semibold text-center text-gray-900 dark:text-gray-100">Our Core Values</h2>
-            <ul className="space-y-2 text-gray-600 list-disc list-inside dark:text-gray-400">
-              {data.coreValues.length > 0 ? (
-                data.coreValues.map((value, index) => <li key={index}>{value ? value.value : 'N/A'}</li>)
-              ) : (
-                <li><SpinnerFallback /></li>
-              )}
-            </ul>
-          </div>
+<ul className="space-y-2 text-gray-600 list-disc list-inside dark:text-gray-400">
+  {data.coreValues?.length > 0 ? (
+    data.coreValues.map((value, index) => <li key={index}>{value}</li>)
+  ) : (
+    <SpinnerFallback />
+  )}
+</ul>          </div>
         </section>
 
         {/* What Our Community Says Section with Auto-Scroll and Round Icon */}
@@ -196,21 +189,21 @@ export default async function About() {
         </section>
 
         {/* History Section */}
-        <section className="px-4 py-16">
-          <div className="max-w-5xl mx-auto">
-            <h2 className="mb-6 text-3xl font-semibold text-center text-gray-900 dark:text-gray-100">Our History</h2>
-            <div className="mb-6 text-lg text-gray-600 dark:text-gray-400">{data.history || <SpinnerFallback />}</div>
+{/* History Section */}
+      <section className="px-4 py-16">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="mb-6 text-3xl font-semibold text-center text-gray-900 dark:text-gray-100">Our History</h2>
+          <div className="mb-6 text-lg text-gray-600 dark:text-gray-400">{data.history || <SpinnerFallback />}</div>
+          {data.historyMilestones && data.historyMilestones.length > 0 && (
             <ul className="space-y-2 text-gray-600 list-disc list-inside dark:text-gray-400">
-              {data.historyMilestones && data.historyMilestones.length > 0 ? (
-                data.historyMilestones.map((milestone, index) => <li key={index}>{milestone.milestone}</li>)
-              ) : (
-                <li><SpinnerFallback /></li>
-              )}
+              {data.historyMilestones.map((milestone, index) => (
+                <li key={index}>{milestone.milestone}</li>
+              ))}
             </ul>
-          </div>
-        </section>
+          )}
+        </div>
+      </section>
       </main>
       <Footer />
-    </div>
-  );
+    </div>  );
 }
