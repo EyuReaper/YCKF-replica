@@ -68,7 +68,7 @@ export default function Home() {
                   Learn More
                 </a>
                 <a
-                  href="/programs"
+                  href="/free-training"
                   className={`px-6 py-3 font-medium rounded-lg transition-colors duration-300 border  ${buttonSecondaryClass}`}
                 >
                   Explore Programs

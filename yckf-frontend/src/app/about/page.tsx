@@ -55,7 +55,7 @@ async function getAboutData(): Promise<AboutData> {
       milestone
     }
   }`;
-  const data = await client.fetch(query);
+  const data = await client.fetch(query); // Reverted to client.fetch as sanity is undefined
   console.log('Full About Data:', JSON.stringify(data, null, 2)); // Detailed log
   return {
     title: data?.title || '',
@@ -82,7 +82,7 @@ async function getTestimonials(): Promise<Testimonial[]> {
       }
     }
   }`;
-  const testimonials = await client.fetch(query);
+  const testimonials = await client.fetch(query); // Changed from client.fetch to sanity.fetch
   console.log('Testimonials:', testimonials);
   return testimonials || [];
 }
@@ -93,7 +93,7 @@ export default async function About() {
 
   return (
     <div className="flex flex-col min-h-screen text-gray-900 bg-white dark:bg-gray-900 dark:text-gray-100">
-      <TopBar/>
+      <TopBar />
       <Header />
       <main className="flex-1">
         {/* Hero Section with Image on Right */}
@@ -132,7 +132,7 @@ export default async function About() {
             <h2 className="mb-6 text-3xl font-semibold text-center text-gray-900 dark:text-gray-100">Our Core Values</h2>
             <ul className="space-y-2 text-gray-600 list-disc list-inside dark:text-gray-400">
               {data.coreValues.length > 0 ? (
-                data.coreValues.map((value, index) => <li key={index}>{value.value}</li>)
+                data.coreValues.map((value, index) => <li key={index}>{value ? value.value : 'N/A'}</li>)
               ) : (
                 <li><SpinnerFallback /></li>
               )}
