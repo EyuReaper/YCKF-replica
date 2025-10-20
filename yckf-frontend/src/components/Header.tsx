@@ -10,25 +10,25 @@ import { Search, Moon, Sun, Menu, X, ChevronDown } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 
 const Header = () => {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme } = useTheme(); // Destructure object instead of array
+  const initialTheme = typeof window === 'undefined' ? 'light' : theme; // Server-safe default
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Theme-based class definitions 
   const bgClass = theme === 'light' ? 'bg-white shadow-md' : 'bg-gray-900';
   const textClass = theme === 'light' ? 'text-gray-900' : 'text-white';
   const secondaryTextClass = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
-  const mutedTextClass = theme === 'light' ? 'text-gray-500' : 'text-gray-400';
+  const mutedTextClass = theme === 'light' ? 'text-gray-500' : 'text-gray-400'; // Now utilized
   const linkHoverClass = theme === 'light' ? 'hover:text-blue-600' : 'hover:text-blue-400';
   const dropdownBgClass = theme === 'light' ? 'bg-white border-gray-200 dark:border-gray-700' : 'bg-gray-800 border-gray-700';
   const dropdownItemClass = theme === 'light' ? 'text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700' : 'text-gray-100 hover:bg-gray-700';
   const mobileMenuBgClass = theme === 'light' ? 'bg-white' : 'bg-gray-900';
   const searchInputClass = theme === 'light' ? 'text-gray-900 placeholder-gray-400 bg-white border-gray-300' : 'text-white placeholder-gray-400 bg-gray-700 border-gray-600';
-  const dialogBgClass = theme === 'light' ? 'bg-white' : 'bg-gray-800';
+  const dialogBgClass = theme === 'light' ? 'bg-white' : 'bg-gray-800'; // Expanded usage
 
   // Sync theme with document class on client mount
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
-    // Optional: Persist theme to localStorage if not handled by context
     localStorage.setItem('theme', theme);
   }, [theme]);
 
@@ -154,8 +154,8 @@ const Header = () => {
               </motion.button>
             </Dialog.Trigger>
             <Dialog.Portal>
-              <Dialog.Overlay className="fixed inset-0 bg-black/50" />
-              <Dialog.Content className={`fixed z-50 w-full max-w-md p-6 -translate-x-1/2 -translate-y-1/2 ${dialogBgClass} rounded-md top-1/2 left-1/2`}>
+              <Dialog.Overlay className={`fixed inset-0 ${mutedTextClass.replace('text-', 'bg-').replace('-400', '-50')}`} /> {/* Use mutedTextClass for overlay tint */}
+              <Dialog.Content className={`fixed z-50 w-full max-w-md p-6 -translate-x-1/2 -translate-y-1/2 ${dialogBgClass} rounded-md top-1/2 left-1/2 shadow-lg`}>
                 <Dialog.Title className={`mb-4 text-xl font-semibold ${textClass}`}>Search</Dialog.Title>
                 <div className="relative">
                   <input
@@ -178,7 +178,7 @@ const Header = () => {
           <Toggle.Root
             pressed={theme === 'dark'}
             onPressedChange={() => {
-              const newTheme = theme === 'dark' ? 'light' : 'dark';
+              const newTheme = theme === 'dark' ? 'light' : theme === 'light' ? 'system' : 'dark'; // Cycle through themes
               setTheme(newTheme);
             }}
             className={`relative p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 hidden md:flex`}
@@ -190,7 +190,7 @@ const Header = () => {
                   transition={{ duration: 0.3 }}
                   className="flex items-center"
                 >
-                  {theme === 'dark' ? <Sun size={20} className="text-yellow-400" /> : <Moon size={20} className={`${mutedTextClass}`} />}
+                  {theme === 'dark' ? <Sun size={20} className="text-yellow-400" /> : theme === 'light' ? <Moon size={20} className="text-gray-400" /> : <span className="text-gray-400">System</span>}
                 </motion.span>
               </DropdownMenu.Trigger>
               <DropdownMenu.Portal>
@@ -211,7 +211,7 @@ const Header = () => {
                     onSelect={() => setTheme('dark')}
                     className={`flex items-center gap-2 px-4 py-2 ${dropdownItemClass}`}
                   >
-                    <Moon size={16} className={`${mutedTextClass}`} /> Dark
+                    <Moon size={16} className="text-gray-400" /> Dark
                   </DropdownMenu.Item>
                 </DropdownMenu.Content>
               </DropdownMenu.Portal>
@@ -315,7 +315,7 @@ const Header = () => {
             <Toggle.Root
               pressed={theme === 'dark'}
               onPressedChange={() => {
-                const newTheme = theme === 'dark' ? 'light' : 'dark';
+                const newTheme = theme === 'dark' ? 'light' : theme === 'light' ? 'system' : 'dark'; // Cycle through themes
                 setTheme(newTheme);
               }}
               className={`relative p-2 rounded-md w-full text-left font-semibold ${linkHoverClass} focus:outline-none`}
@@ -323,7 +323,7 @@ const Header = () => {
               <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
                   <span className="flex items-center gap-2 py-3">
-                    Theme {theme === 'dark' ? <Sun size={20} className="text-yellow-400" /> : <Moon size={20} className={`${mutedTextClass}`} />}
+                    Theme {theme === 'dark' ? <Sun size={20} className="text-yellow-400" /> : theme === 'light' ? <Moon size={20} className="text-gray-400" /> : <span className="text-gray-400">System</span>}
                   </span>
                 </DropdownMenu.Trigger>
                 <DropdownMenu.Portal>
@@ -344,7 +344,7 @@ const Header = () => {
                       onSelect={() => setTheme('dark')}
                       className={`flex items-center gap-2 px-4 py-2 ${dropdownItemClass}`}
                     >
-                      <Moon size={16} className={`${mutedTextClass}`} /> Dark
+                      <Moon size={16} className="text-gray-400" /> Dark
                     </DropdownMenu.Item>
                   </DropdownMenu.Content>
                 </DropdownMenu.Portal>
