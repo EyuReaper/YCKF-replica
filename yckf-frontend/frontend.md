@@ -1,5 +1,3 @@
-
-
 # YCKF Frontend
 
 This project is the frontend portion of the YCKF application. It is built using Next.js and is organized into several well-defined sections to promote modularity and ease of maintenance.
