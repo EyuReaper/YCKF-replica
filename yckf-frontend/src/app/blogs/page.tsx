@@ -9,7 +9,7 @@ export default async function Blogs() {
     <div className="flex flex-col min-h-screen text-gray-900 bg-white dark:bg-gray-900 dark:text-gray-100">
       <TopBar />
       <Header />
-      <Suspense fallback={<div>Loading news...</div>}>
+      <Suspense fallback={<BlogsClient.SpinnerFallback />}>
         <BlogsClient />
       </Suspense>
       <Footer />
