@@ -21,7 +21,7 @@ const Header = () => {
   const mutedTextClass = theme === 'light' ? 'text-gray-500' : 'text-gray-400'; // Now utilized
   const linkHoverClass = theme === 'light' ? 'hover:text-blue-600' : 'hover:text-blue-400';
   const dropdownBgClass = theme === 'light' ? 'bg-white border-gray-200 dark:border-gray-700' : 'bg-gray-800 border-gray-700';
-  const dropdownItemClass = theme === 'light' ? 'text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700' : 'text-gray-100 hover:bg-gray-700';
+  const dropdownItemClass = theme === 'light' ? 'text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-100' : 'dark:text-gray-100 hover:bg-gray-700';
   const mobileMenuBgClass = theme === 'light' ? 'bg-white' : 'bg-gray-900';
   const searchInputClass = theme === 'light' ? 'text-gray-900 placeholder-gray-400 bg-white border-gray-300' : 'text-white placeholder-gray-400 bg-gray-700 border-gray-600';
   const dialogBgClass = theme === 'light' ? 'bg-white' : 'bg-gray-800'; // Expanded usage

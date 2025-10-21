@@ -7,7 +7,6 @@ import team from './team';
 import topPerformers from './top-performers';
 import volunteers from './volunteers';
 import freeTraining from './freeTraining';
-import Blogs from './blogs';
 import premiumTraining from './premiumTraining';
 import studentEnrollment from './studentEnrollment';
 import courseProgress from './courseProgress';
@@ -17,4 +16,4 @@ import paymentLog from './paymentLog';
 import faq from './faq';
 
 
-export const schemaTypes = [about, testimonial, careers, events, interns, team, topPerformers, volunteers, freeTraining, Blogs, premiumTraining, studentEnrollment, courseProgress, user, auditLog, paymentLog, faq]; 
+export const schemaTypes = [about, testimonial, careers, events, interns, team, topPerformers, volunteers, freeTraining,  premiumTraining, studentEnrollment, courseProgress, user, auditLog, paymentLog, faq]; 
