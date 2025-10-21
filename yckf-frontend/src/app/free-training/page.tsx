@@ -1,3 +1,4 @@
+'use client'; // Mark as Client Component to use useTheme
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -6,6 +7,9 @@ import { RiLoader2Fill } from 'react-icons/ri'; // Import a spinner icon from re
 import Link from 'next/link'; // Import Link for navigation
 import TopBar from '@/components/TopBar';
 import TrainingImage from '@/components/TrainingImage'; // Import the new Client Component
+import { useTheme } from '@/context/ThemeContext'; // Import the useTheme hook
+import { useState, useEffect } from 'react';
+import { Suspense } from 'react';
 
 // Define interface for Sanity data
 interface TrainingData {
@@ -25,106 +29,153 @@ interface TrainingResponse {
 }
 
 // Helper component for the spinner fallback
-const SpinnerFallback = () => (
-  <div className="flex items-center justify-center py-8">
-    <RiLoader2Fill className="w-12 h-12 text-gray-500 animate-spin dark:text-gray-400" />
-  </div>
-);
-
-async function getTrainingData(): Promise<TrainingResponse> {
-  const query = `*[_type == "freeTraining"] {
-    title,
-    description,
-    date,
-    duration,
-    instructor,
-    registrationUrl,
-    image {
-      asset->{
-        url
-      }
-    },
-    capacity,
-    location
-  }`;
-  const trainings = await client.fetch(query);
-  console.log('Training Data:', trainings); // Debug log
-  return { trainings: trainings || [] };
-}
-
-export default async function FreeTraining() {
-  const { trainings } = await getTrainingData();
+const SpinnerFallback = () => {
+  const { theme } = useTheme();
+  const textClass = theme === 'light' ? 'text-gray-500' : 'text-gray-400';
 
   return (
-    <div className="flex flex-col min-h-screen text-gray-900 bg-white dark:bg-gray-900 dark:text-gray-100">
+    <div className="flex items-center justify-center py-8">
+      <RiLoader2Fill className={`w-12 h-12 ${textClass} animate-spin`} />
+    </div>
+  );
+};
+
+export default function FreeTraining() {
+  const { theme } = useTheme(); // Access the theme from context
+
+  const [trainings, setTrainings] = useState<TrainingData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchTrainingData = async () => {
+      try {
+        const query = `*[_type == "freeTraining"] {
+          title,
+          description,
+          date,
+          duration,
+          instructor,
+          registrationUrl,
+          image {
+            asset->{
+              url
+            }
+          },
+          capacity,
+          location
+        }`;
+        const response = await client.fetch(query);
+        if (isMounted) setTrainings(response || []);
+      } catch (error) {
+        console.error('❌ Failed to fetch training data:', error);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    fetchTrainingData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Dynamic classes based on theme
+  const bgClass = theme === 'light' ? 'bg-white' : 'bg-gray-900';
+  const textClass = theme === 'light' ? 'text-gray-900' : 'text-gray-100';
+  const subTextClass = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
+  const borderClass = theme === 'light' ? 'border-gray-100' : 'border-gray-700';
+  const inputBgClass = theme === 'light' ? 'bg-white' : 'bg-gray-700';
+  const inputBorderClass = theme === 'light' ? 'border-gray-300' : 'border-gray-600';
+  const inputTextClass = theme === 'light' ? 'text-gray-900' : 'text-gray-100';
+  const cardBgClass = theme === 'light' ? 'bg-white' : 'bg-gray-800';
+  const buttonBgClass = theme === 'light' ? 'bg-blue-600' : 'bg-blue-700';
+  const buttonHoverClass = theme === 'light' ? 'hover:bg-blue-700' : 'hover:bg-blue-800';
+  const buttonTextClass = theme === 'light' ? 'bg-blue-100' : 'bg-blue-900';
+  const buttonTextHoverClass = theme === 'light' ? 'hover:bg-blue-200' : 'hover:bg-blue-800';
+  const errorTextClass = theme === 'light' ? 'text-red-600' : 'text-red-400';
+
+  return (
+    <div className={`flex flex-col min-h-screen ${textClass} ${bgClass} dark:${bgClass} dark:${textClass}`}>
       <TopBar />
       <Header />
       <main className="flex-1">
         {/* Main Content Section */}
-        <section className="px-4 py-16 mx-auto max-w-7xl">
-          <h1 className="mb-6 text-4xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100">Free Training Sessions</h1>
-          <p className="max-w-2xl mb-8 text-lg text-gray-600 dark:text-gray-400">
+        <section className={`px-4 py-16 mx-auto max-w-7xl ${bgClass}`}>
+          <h1 className={`mb-6 text-4xl font-extrabold tracking-tight ${textClass}`}>Free Training Sessions</h1>
+          <p className={`max-w-2xl mb-8 text-lg ${subTextClass}`}>
             Unlock your potential with our expertly designed free training sessions in cybersecurity. Start your journey today!
           </p>
 
           {/* Get Started Button */}
           <div className="mb-10">
-            <Link href="/get-started" className="inline-block px-6 py-3 text-lg font-semibold text-white transition-colors duration-200 bg-blue-600 rounded-lg shadow-md hover:bg-blue-700">
+            <Link
+              href="/get-started"
+              className={`inline-block px-6 py-3 text-lg font-semibold text-white transition-colors duration-200 ${buttonBgClass} rounded-lg shadow-md ${buttonHoverClass}`}
+            >
               Get Started
             </Link>
           </div>
 
           {/* Search and Filters */}
-          <div className="flex flex-col justify-between mb-8 space-y-4 md:flex-row md:space-y-0 md:space-x-4">
+          <div className={`flex flex-col justify-between mb-8 space-y-4 md:flex-row md:space-y-0 md:space-x-4 ${bgClass}`}>
             <input
               type="text"
               placeholder="Search Training..."
-              className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 md:w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full px-4 py-2 ${inputBgClass} ${inputBorderClass} rounded-md ${inputTextClass} md:w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500`}
             />
-            <select className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 md:w-1/4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <select className={`w-full px-4 py-2 ${inputBgClass} ${inputBorderClass} rounded-md ${inputTextClass} md:w-1/4 focus:outline-none focus:ring-2 focus:ring-blue-500`}>
               <option>All Instructors</option>
               {/* Add dynamic options if needed */}
             </select>
-            <select className="w-full px-4 py-2 bg-white border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 md:w-1/4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <select className={`w-full px-4 py-2 ${inputBgClass} ${inputBorderClass} rounded-md ${inputTextClass} md:w-1/4 focus:outline-none focus:ring-2 focus:ring-blue-500`}>
               <option>All Dates</option>
               {/* Add dynamic options if needed */}
             </select>
           </div>
 
-          {trainings.length > 0 ? (
+          {loading ? (
+            <Suspense fallback={<SpinnerFallback />}>
+              <div>Loading...</div> {/* Placeholder while data fetches */}
+            </Suspense>
+          ) : trainings.length > 0 ? (
             <div className="space-y-6">
               {trainings.map((training, index) => (
-                <div key={index} className="flex items-start p-6 transition-shadow duration-200 bg-white border border-gray-100 shadow-lg rounded-xl dark:bg-gray-800 dark:border-gray-700 hover:shadow-xl md:items-center">
+                <div
+                  key={index}
+                  className={`flex items-start p-6 transition-shadow duration-200 ${cardBgClass} ${borderClass} shadow-lg rounded-xl hover:shadow-xl md:items-center`}
+                >
                   {training.image?.asset?.url ? (
                     <TrainingImage url={training.image.asset.url} alt={training.title} title={training.title} />
                   ) : (
-                    <div className="flex items-center justify-center w-32 h-32 mr-6 bg-gray-200 rounded-lg dark:bg-gray-700">
-                      <span className="text-gray-500 dark:text-gray-400">No image</span>
+                    <div className={`flex items-center justify-center w-32 h-32 mr-6 ${inputBgClass} rounded-lg`}>
+                      <span className={subTextClass}>No image</span>
                     </div>
                   )}
                   <div className="flex-1">
-                    <h3 className="mb-2 text-xl font-bold text-gray-900 dark:text-gray-100">{training.title}</h3>
-                    <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                    <h3 className={`mb-2 text-xl font-bold ${textClass}`}>{training.title}</h3>
+                    <p className={`mb-2 text-sm ${subTextClass}`}>
                       {new Date(training.date).toLocaleDateString()} | {training.duration}
                     </p>
-                    <p className="mb-2 text-gray-600 dark:text-gray-400">Instructor: {training.instructor}</p>
-                    {training.capacity && (
-                      <p className="mb-2 text-gray-600 dark:text-gray-400">Capacity: {training.capacity}</p>
-                    )}
-                    {training.location && (
-                      <p className="mb-2 text-gray-600 dark:text-gray-400">Location: {training.location}</p>
-                    )}
-                    <p className="mb-4 text-gray-600 dark:text-gray-400 line-clamp-3">{training.description}</p>
+                    <p className={subTextClass}>Instructor: {training.instructor}</p>
+                    {training.capacity && <p className={subTextClass}>Capacity: {training.capacity}</p>}
+                    {training.location && <p className={subTextClass}>Location: {training.location}</p>}
+                    <p className={`mb-4 ${subTextClass} line-clamp-3`}>{training.description}</p>
                     <div className="flex space-x-4">
                       <a
                         href={training.registrationUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-block px-4 py-2 text-sm font-medium text-white transition-colors duration-200 bg-green-600 rounded-md hover:bg-green-700"
+                        className={`inline-block px-4 py-2 text-sm font-medium text-white transition-colors duration-200 ${buttonBgClass} rounded-md ${buttonHoverClass}`}
                       >
                         Register Now
                       </a>
-                      <Link href={`/training/${index}`} className="inline-block px-4 py-2 text-sm font-medium text-blue-600 transition-colors duration-200 bg-blue-100 rounded-md hover:bg-blue-200 dark:text-blue-400 dark:bg-blue-900 dark:hover:bg-blue-800">
+                      <Link
+                        href={`/training/${index}`}
+                        className={`inline-block px-4 py-2 text-sm font-medium ${textClass} transition-colors duration-200 ${buttonTextClass} rounded-md ${buttonTextHoverClass}`}
+                      >
                         View Details
                       </Link>
                     </div>
@@ -135,7 +186,7 @@ export default async function FreeTraining() {
           ) : (
             <div className="py-12 text-center">
               <SpinnerFallback />
-              <p className="mt-4 text-red-600 dark:text-red-400">No training sessions available at the moment.</p>
+              <p className={errorTextClass}>No training sessions available at the moment.</p>
             </div>
           )}
         </section>
