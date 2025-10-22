@@ -1,11 +1,11 @@
 // src/routes/payments.ts
 
 import { Router } from 'express';
-import { paymentController } from '../controllers/paymentController.js'; // From controllers
-import { authMiddleware, validate } from '../middleware/authMiddleware.js'; // From middleware (auth)
-import { paymentSchema } from '../middleware/validationMiddleware.js'; // From middleware (validation)
-import { auditLog } from '../lib/audit.js'; // From lib
-import { PaymentLog, Enrollment } from '../models/PaymentLog.js'; // From models (PaymentLog only; Enrollment in controller)
+import { paymentController } from '../controllers/paymentController.js';
+import { authMiddleware } from '../middleware/authMiddleware.js';
+import { validate, paymentSchema } from '../middleware/validationMiddleware.js';
+import { auditLog } from '../lib/audit.js';
+import { PaymentLog, Enrollment } from '../models/PaymentLog.js';
 
 const router = Router();
 

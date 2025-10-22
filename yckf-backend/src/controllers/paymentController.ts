@@ -2,10 +2,10 @@
 import { Request, Response } from 'express';
 import Stripe from 'stripe';
 import Paystack from 'paystack'; // Assume installed as 'paystack-node'
-import { Enrollment } from '../models/Enrollment'; // Import model
-import { PaymentLog } from '../models/PaymentLog'; // Import model
-import { getExchangeRate } from '../services/exchangeRateService';
-import { authMiddleware } from '../middleware/authMiddleware'; // For user from req
+import { Enrollment } from '../models/Enrollment.js'; // Import model
+import { PaymentLog } from '../models/PaymentLog.js'; // Import model
+import { getExchangeRate } from '../services/exchangeRateServices.js';
+import { authMiddleware } from '../middleware/authMiddleware.js'; // For user from req
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', { apiVersion: '2024-06-20' });
 const paystack = Paystack(process.env.PAYSTACK_SECRET_KEY || '');
