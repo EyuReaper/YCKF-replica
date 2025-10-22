@@ -8,3 +8,4 @@ export const sanity = createClient({
   apiVersion: '2023-05-03',
   useCdn: process.env.NODE_ENV === 'production', // Fixed: Conditional CDN (cache in prod, real-time in dev)
 });
+export default sanity;

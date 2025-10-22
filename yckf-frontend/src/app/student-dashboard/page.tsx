@@ -2,7 +2,7 @@
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { client } from '@/lib/sanity';
+import { client } from '@/lib/sanity.client';
 import { RiLoader2Fill } from 'react-icons/ri';
 import Link from 'next/link';
 import TopBar from '@/components/TopBar';
