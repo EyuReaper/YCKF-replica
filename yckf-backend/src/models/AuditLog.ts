@@ -1,7 +1,6 @@
 import { schemaTypes } from '../../../yckf-sanity/schemaTypes/index.js';;
 
-import mongoose, { Schema, Document } from 'mongoose';
-import { Schema, model, models } from 'mongoose';
+import mongoose, { Schema, model, Document } from 'mongoose';
 
 interface IAuditLog extends Document {
   action: string;
@@ -40,4 +39,4 @@ const AuditLogSchema: Schema = new Schema<IAuditLog>({
   timestamps: true,
 });
 
-export const AuditLog = models.AuditLog || model<IAuditLog>('AuditLog', AuditLogSchema);
+export const AuditLog = mongoose.models.AuditLog || model<IAuditLog>('AuditLog', AuditLogSchema);
