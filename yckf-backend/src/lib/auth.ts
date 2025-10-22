@@ -1,7 +1,7 @@
 
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import { sanity } from './sanity.client..js';
+import { sanity } from './sanity.client.js';
 
 if (!process.env.JWT_SECRET) {
   throw new Error('JWT_SECRET environment variable is required'); // Fixed: Early env check

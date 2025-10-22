@@ -8,4 +8,4 @@ export const client = createClient({
   useCdn: process.env.NODE_ENV === 'production', // Enable CDN in production
 });
 
- 
+export default client;

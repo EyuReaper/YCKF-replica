@@ -1,5 +1,5 @@
 
-import { sanity } from './sanity.client..js';
+import { sanity } from './sanity.client.js';
 
 export async function auditLog(entry: {
   action: string;

@@ -4,25 +4,28 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
-// 🧭 Router Imports
+//  Router Imports
 import { router as authRouter } from './routes/auth.js';
 import { router as coursesRouter } from './routes/courses.js';
-import { router as paymentsRouter } from './routes/payments.js';
+import   paymentsRouter  from './routes/payments.js';
 import { router as certificatesRouter } from './routes/certificates.js';
 import { router as adminRouter } from './routes/admin.js';
-import { router as enrollmentsRouter } from './routes/enrollments.js';
-import { router as progressRouter } from './routes/progress.js';
-import { router as botsRouter } from './routes/bots.js';
+import  enrollmentsRouter  from './routes/enrollments.js';
+import   progressRouter  from './routes/progress.js';
+import botsRouter from './routes/bots.js';
+import { sanity }  from './lib/sanity.client.js';
 
-// ⚙️ Config Imports
+//  Config Imports
 import { connectDB } from './config/database.js';
 import { corsMiddleware } from './config/cors.js';
 
-// 🛡️ Middleware Imports
+//  Middleware Imports
 import { authMiddleware } from './middleware/authMiddleware.js';
 import { rateLimitMiddleware } from './middleware/rateLimit.js';
 
-// 🧩 Verification logs (helpful for debugging)
+console.log('SANITY_PROJECT_ID from env:', process.env.SANITY_PROJECT_ID); // Debugging line
+
+//  Verification logs (helpful for debugging)
 console.log('Twilio SID:', process.env.TWILIO_ACCOUNT_SID ? '✅ Set' : '❌ Missing');
 console.log('Telegram Token:', process.env.TELEGRAM_BOT_TOKEN ? '✅ Set' : '❌ Missing');
 
@@ -33,20 +36,20 @@ async function startServer() {
   const app = express();
 
   try {
-    // 1️⃣ Connect to Database
+    //  Connect to Database
     await connectDB();
     console.log('✅ Database connected successfully');
 
-    // 2️⃣ Apply Global Middleware
+    //  Apply Global Middleware
     app.use(helmet());
     app.use(corsMiddleware || cors()); // fallback to default CORS if custom config missing
     app.use(express.json({ limit: '2mb' }));
     app.use(morgan('combined'));
 
-    // 3️⃣ Optional Rate Limiter (example: payments)
+    //  Optional Rate Limiter (example: payments)
     if (rateLimitMiddleware) app.use('/api/payments', rateLimitMiddleware);
 
-    // 4️⃣ Health Check Route
+    //  Health Check Route
     app.get('/health', (_req, res) =>
       res.json({ ok: true, timestamp: new Date().toISOString() })
     );
@@ -66,19 +69,20 @@ async function startServer() {
       res.status(404).json({ success: false, message: 'Endpoint not found' })
     );
 
-    // 7️⃣ Global Error Handler
-    app.use((err, _req, res, _next) => {
+    //  Global Error Handler
+    app.use((err:Error, _req:express.Request, res:express.Response, _next:express.NextFunction) => {
       console.error('❌ Unhandled error:', err);
       res.status(500).json({ success: false, message: 'Internal server error' });
     });
 
-    // 8️⃣ Start Server
+    //  Start Server
     const port = Number(process.env.PORT) || 4000;
     app.listen(port, () => {
       console.log(`🚀 yckf-backend running on port ${port}`);
     });
-  } catch (error) {
-    console.error('💥 Failed to start server:', error.message);
+  } catch (error: unknown) {
+    const err = error as Error; //type assertion for better error handling
+    console.error('💥 Failed to start server:', err.message);
     process.exit(1);
   }
 }

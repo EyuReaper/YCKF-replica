@@ -1,4 +1,3 @@
-// src/lib/sanity.client.ts
 
 import { createClient } from '@sanity/client';
 

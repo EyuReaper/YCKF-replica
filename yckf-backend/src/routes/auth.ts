@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import jwt from 'jsonwebtoken';
-import { sanity } from '../lib/sanity.client..js';
+import { sanity } from '../lib/sanity.client.js';
 import { Auth } from '../lib/auth.js';
 import { auditLog } from '../lib/audit.js';
 
