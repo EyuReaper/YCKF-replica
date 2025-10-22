@@ -9,7 +9,6 @@ import TopBar from '@/components/TopBar';
 import TrainingImage from '@/components/TrainingImage'; // Import the new Client Component
 import { useTheme } from '@/context/ThemeContext'; // Import the useTheme hook
 import { useState, useEffect } from 'react';
-import { Suspense } from 'react';
 
 // Define interface for Sanity data
 interface TrainingData {
@@ -45,12 +44,14 @@ export default function FreeTraining() {
 
   const [trainings, setTrainings] = useState<TrainingData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
 
     const fetchTrainingData = async () => {
       try {
+        console.log('Fetching training data...');
         const query = `*[_type == "freeTraining"] {
           title,
           description,
@@ -66,10 +67,12 @@ export default function FreeTraining() {
           capacity,
           location
         }`;
-        const response = await client.fetch(query);
-        if (isMounted) setTrainings(response || []);
+        const response = await client.fetch<TrainingResponse>(query);
+        console.log('Fetched data:', response);
+        if (isMounted) setTrainings(response.trainings || []);
       } catch (error) {
         console.error('❌ Failed to fetch training data:', error);
+        if (isMounted) setError('Failed to load training sessions. Please try again later.');
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -137,9 +140,12 @@ export default function FreeTraining() {
           </div>
 
           {loading ? (
-            <Suspense fallback={<SpinnerFallback />}>
-              <div>Loading...</div> {/* Placeholder while data fetches */}
-            </Suspense>
+            <SpinnerFallback />
+          ) : error ? (
+            <div className="py-12 text-center">
+              <SpinnerFallback />
+              <p className={errorTextClass}>{error}</p>
+            </div>
           ) : trainings.length > 0 ? (
             <div className="space-y-6">
               {trainings.map((training, index) => (
