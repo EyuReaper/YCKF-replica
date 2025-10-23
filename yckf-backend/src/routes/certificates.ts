@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import PDFDocument from 'pdfkit';
 import { z } from 'zod';
-import { client } from '../../lib/sanity.client';
+import { sanity } from '../lib/sanity.client.js';
 import { requireRole } from '../lib/auth.js';
 import { auditLog } from '../lib/audit.js';
 

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { requireRole } from '../lib/auth.js';
-import { client } from '../../lib/sanity.client';
+import { sanity } from '../lib/sanity.client.js';
 export const router = Router();
 
 router.get('/analytics', requireRole(['master_admin','secondary_admin']), async (_req, res) => {
