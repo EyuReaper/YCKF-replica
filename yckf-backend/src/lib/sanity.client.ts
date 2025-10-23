@@ -2,7 +2,7 @@
 import { createClient } from '@sanity/client';
 
 const sanity = createClient({
-  projectId: process.env.SANITY_PROJECT_ID!,
+  projectId: process.env.SANITY_PROJECT_ID || 'je36hluy', // fallback for testing
   dataset: process.env.SANITY_DATASET || 'production',
   token: process.env.SANITY_TOKEN,
   apiVersion: '2023-05-03',

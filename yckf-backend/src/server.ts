@@ -50,11 +50,11 @@ async function startServer() {
     if (rateLimitMiddleware) app.use('/api/payments', rateLimitMiddleware);
 
     //  Health Check Route
-    app.get('/health', (_req, res) =>
+    app.get('/health', (_req:express.Request, res:express.Response) =>
       res.json({ ok: true, timestamp: new Date().toISOString() })
     );
 
-    // 5️⃣ API Routes
+    //  API Routes
     app.use('/api/auth', authRouter);
     app.use('/api/courses', coursesRouter);
     app.use('/api/payments', paymentsRouter);
@@ -64,8 +64,8 @@ async function startServer() {
     app.use('/api/progress', progressRouter);
     app.use('/api/bots', botsRouter);
 
-    // 6️⃣ 404 Handler (AFTER routes)
-    app.use('*', (_req, res) =>
+    //  404 Handler (AFTER routes)
+    app.use('*', (_req:express.Request, res:express.Response) =>
       res.status(404).json({ success: false, message: 'Endpoint not found' })
     );
 
