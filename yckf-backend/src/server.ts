@@ -22,6 +22,7 @@ import { corsMiddleware } from './config/cors.js';
 //  Middleware Imports
 import { authMiddleware } from './middleware/authMiddleware.js';
 import { rateLimitMiddleware } from './middleware/rateLimit.js';
+import mongoose from 'mongoose';
 
 console.log('SANITY_PROJECT_ID from env:', process.env.SANITY_PROJECT_ID); // Debugging line
 
@@ -63,6 +64,22 @@ async function startServer() {
     app.use('/api/enrollments', enrollmentsRouter);
     app.use('/api/progress', progressRouter);
     app.use('/api/bots', botsRouter);
+
+        // Simple DB test endpoint
+    app.get('/test-db', async (req: express.Request, res: express.Response) => {
+      try {
+        const db = mongoose.connection.db;
+        if (!db) {
+          return res.status(500).json({ connected: false, error: 'Database connection not available' });
+        }
+
+        const count = await db.collection('users').countDocuments();
+        return res.json({ connected: true, collectionCount: count });
+      } catch (error: unknown) {
+        const err = error as Error;
+        return res.status(500).json({ connected: false, error: err.message });
+      }
+    });
 
     //  404 Handler (AFTER routes)
     app.use('*', (_req:express.Request, res:express.Response) =>
